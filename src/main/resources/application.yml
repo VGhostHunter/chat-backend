@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: chat
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
+  profiles:
+    active: dev
+server:
+  port: 62519
+nettyserver:
+  port: 62520
+
+chat:
+  appId: appId
+  appKey: appKey
+  masterSecret: masterSecret
+  url: http://sdk.open.api.igexin.com/apiex.htm
+

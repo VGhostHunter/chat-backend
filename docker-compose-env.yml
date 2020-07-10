@@ -1,0 +1,96 @@
+version: "3.7"
+services:
+  mysql:
+    image: 'mysql:5.7'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - '3306:3306'
+    restart: always
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--sort_buffer_size=8M']
+
+  mongodb1:
+    build:
+      context: .
+      dockerfile: Dockerfile_Mongo
+    restart: always
+    container_name: mongo1
+    volumes:
+      - mongo_data1:/data/db
+      - mongo_key:/data/mongodb.key
+    ports:
+      - 27017:27017
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    networks:
+      - backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+  mongodb2:
+    image: mongo
+    restart: always
+    container_name: mongo2
+    volumes:
+      - mongo_data2:/data/db
+      - mongo_key:/data/mongodb.key
+    ports:
+      - 27018:27017
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    networks:
+      - backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+  mongodb3:
+    image: mongo
+    restart: always
+    container_name: mongo3
+    volumes:
+      - mongo_data3:/data/db
+      - mongo_key:/data/mongodb.key
+    ports:
+      - 27019:27017
+    env_file: .env
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql_data: /data/mysql
+  mongo_data1: /data/mongo1
+  mongo_data2: /data/mongo2
+  mongo_data3: /data/mongo3
+  mongo_key: /data/mongokey
