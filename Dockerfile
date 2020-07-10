@@ -10,4 +10,4 @@ FROM openjdk:8-jre-alpine
 COPY --from=build /app/target/chat.jar /app/chat.jar
 
 EXPOSE 62519 62520
-ENTRYPOINT [ "sh", "-c", "java -jar /app/realtime.jar"]
+ENTRYPOINT [ "sh", "-c", "java -jar /app/chat.jar"]

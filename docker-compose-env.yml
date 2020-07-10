@@ -1,9 +1,9 @@
-version: "3.7"
+version: "3.3"
 services:
   mysql:
     image: 'mysql:5.7'
     volumes:
-      - mysql_data:/var/lib/mysql
+      - /data/mysql:/var/lib/mysql
     env_file: .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -11,16 +11,14 @@ services:
       - '3306:3306'
     restart: always
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--sort_buffer_size=8M']
-
   mongodb1:
-    build:
-      context: .
-      dockerfile: Dockerfile_Mongo
+    image: mongo
     restart: always
     container_name: mongo1
     volumes:
-      - mongo_data1:/data/db
-      - mongo_key:/data/mongodb.key
+      - /data/mongo1:/data/db
+      - /data/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27017:27017
     env_file: .env
@@ -42,8 +40,9 @@ services:
     restart: always
     container_name: mongo2
     volumes:
-      - mongo_data2:/data/db
-      - mongo_key:/data/mongodb.key
+      - /data/mongo2:/data/db
+      - /data/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27018:27017
     env_file: .env
@@ -65,8 +64,9 @@ services:
     restart: always
     container_name: mongo3
     volumes:
-      - mongo_data3:/data/db
-      - mongo_key:/data/mongodb.key
+      - /data/mongo3:/data/db
+      - /data/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27019:27017
     env_file: .env
@@ -83,14 +83,6 @@ services:
         chmod 400 /data/mongodb.key
         chown 999:999 /data/mongodb.key
         exec docker-entrypoint.sh $$@
-
 networks:
   backend:
     driver: bridge
-
-volumes:
-  mysql_data: /data/mysql
-  mongo_data1: /data/mongo1
-  mongo_data2: /data/mongo2
-  mongo_data3: /data/mongo3
-  mongo_key: /data/mongokey
