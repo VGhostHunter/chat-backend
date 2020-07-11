@@ -2,24 +2,18 @@ package com.dhy.chat.entity;
 
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
-@Table
+@Table(name = "user")
 @DynamicUpdate()
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
-@EntityListeners(AuditingEntityListener.class)
-public class User implements UserDetails {
+public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private static final long serialVersionUID = 1284011010357285456L;
 
@@ -41,16 +35,9 @@ public class User implements UserDetails {
 
     private Integer locked;
 
-    @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createTime;
-
-    @LastModifiedDate
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateTime;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Authority> authorities = new HashSet<>();
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private List<UserAuthority> userAuthorities = new ArrayList<>();
 
     /**
      * 账户是否过期
@@ -89,11 +76,13 @@ public class User implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return userAuthorities.stream()
+                .map(UserAuthority::getAuthority)
+                .collect(Collectors.toList());
     }
 
-    public void setAuthorities(Set<Authority> authorities) {
-        this.authorities = authorities;
+    public void setAuthorities(List<UserAuthority> userAuthorities) {
+        this.userAuthorities = userAuthorities;
     }
 
     @Override
