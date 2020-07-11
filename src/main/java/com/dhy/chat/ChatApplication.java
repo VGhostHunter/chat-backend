@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  * @author vghosthunter
  */
 @EnableSwagger2
+@EnableJpaAuditing
 @SpringBootApplication
 public class ChatApplication {
 
