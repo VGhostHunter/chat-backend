@@ -13,30 +13,13 @@ public class UserAuthority extends CreateAndUpdateAuditEntity implements Seriali
     private static final long serialVersionUID = 12840110103879056L;
 
     @Id
-    private String userId;
-
-    @Id
-    private String authorityId;
-
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "authorityId", referencedColumnName = "id")
+    @JoinColumn(name = "authority_id", referencedColumnName = "id")
     private Authority authority;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getAuthorityId() {
-        return authorityId;
-    }
-
-    public void setAuthorityId(String authorityId) {
-        this.authorityId = authorityId;
-    }
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     public Authority getAuthority() {
         return authority;
@@ -44,5 +27,13 @@ public class UserAuthority extends CreateAndUpdateAuditEntity implements Seriali
 
     public void setAuthority(Authority authority) {
         this.authority = authority;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -4,7 +4,6 @@ import com.dhy.chat.dto.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -25,8 +24,11 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
 
     private Logger log = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public UserLoginFailureHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * 登录失败返回结果
@@ -40,18 +42,18 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.NOT_FOUND.value());
             response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.NOT_FOUND, "用户名不存在")));
-        }
-        if (exception instanceof LockedException){
+
+        } else if (exception instanceof LockedException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户被冻结")));
-        }
-        if (exception instanceof BadCredentialsException){
+        } else if (exception instanceof BadCredentialsException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户名密码不正确")));
+        } else {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "登录失败")));
         }
-        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "登录失败")));
     }
 }

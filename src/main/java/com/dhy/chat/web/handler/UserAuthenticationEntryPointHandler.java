@@ -2,7 +2,6 @@ package com.dhy.chat.web.handler;
 
 import com.dhy.chat.dto.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -18,8 +17,11 @@ import java.io.IOException;
 @Component
 public class UserAuthenticationEntryPointHandler implements AuthenticationEntryPoint {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public UserAuthenticationEntryPointHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * 用户未登录返回结果

@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author vghosthunter
@@ -32,9 +31,6 @@ import java.util.Map;
 public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     public JwtAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -60,11 +56,11 @@ public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
                     List<GrantedAuthority> authorities = new ArrayList<>();
                     String authority = claims.get("authorities").toString();
                     if(!StringUtils.isEmpty(authority)){
-                        List<Map<String,String>> authorityMap = JSONObject.parseObject(authority, List.class);
-                        for(Map<String,String> role : authorityMap){
-                            if(role != null) {
+                        List<String> authorityMap = JSONObject.parseObject(authority, List.class);
+                        for(String role : authorityMap){
+                            if(!StringUtils.isEmpty(role)) {
                                 Authority auth = new Authority();
-                                auth.setAuthority(role.get("authority"));
+                                auth.setAuthority(role);
                                 authorities.add(auth);
                             }
                         }

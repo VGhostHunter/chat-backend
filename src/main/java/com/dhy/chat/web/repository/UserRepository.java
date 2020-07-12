@@ -1,9 +1,12 @@
-package com.dhy.chat.web.dao;
+package com.dhy.chat.web.repository;
 
 import com.dhy.chat.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserDao extends JpaRepository<User, String> {
+/**
+ * @author vghosthunter
+ */
+public interface UserRepository extends JpaRepository<User, String> {
 
     /**
      * findByUsername

@@ -18,6 +18,11 @@ import java.text.SimpleDateFormat;
 
 /**
  * @author vghosthunter
+ * spring 团队建议：“在bean中始终使用基于构造函数的依赖注入，始终使用断言来强制依赖”。
+ *
+ * 在创建对象的时候，强制依赖别的对象，确保创建对象时每个对象都是有效状态。
+ * 构造器中可以添加对象初始化的校验逻辑。
+ * 可以清楚的区分对象是通过setter方法注入的（非final对象）还是通过强制依赖注入的（final对象）
  */
 @EnableSwagger2
 @EnableJpaAuditing

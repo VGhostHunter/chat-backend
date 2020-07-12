@@ -6,7 +6,9 @@ import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "authority")
+@Table(name = "authority", indexes = {
+    @Index(name = "idx_authority",columnList = "authority", unique = true)
+})
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
 public class Authority extends CreateAndUpdateAuditEntity implements GrantedAuthority {
 
@@ -14,6 +16,7 @@ public class Authority extends CreateAndUpdateAuditEntity implements GrantedAuth
 
     @Id
     @GeneratedValue(generator = "jpa-uuid")
+    @Column(name = "id")
     private String id;
 
     private String authority;

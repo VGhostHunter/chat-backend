@@ -1,9 +1,8 @@
 package com.dhy.chat.web.config;
 
-import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
+import com.dhy.chat.ChatAppSeeder;
 import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.handler.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -13,35 +12,48 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true) //开启权限注解,默认是关闭的
+/**
+ * @author vghosthunter
+ * 开启权限注解,默认是关闭的
+ */
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * 自定义登录成功处理器
      */
-    @Autowired
-    private UserLoginSuccessHandler userLoginSuccessHandler;
+    private final UserLoginSuccessHandler userLoginSuccessHandler;
     /**
      * 自定义登录失败处理器
      */
-    @Autowired
-    private UserLoginFailureHandler userLoginFailureHandler;
+
+    private final UserLoginFailureHandler userLoginFailureHandler;
     /**
      * 自定义注销成功处理器
      */
-    @Autowired
-    private UserLogoutSuccessHandler userLogoutSuccessHandler;
+    private final UserLogoutSuccessHandler userLogoutSuccessHandler;
     /**
      * 自定义暂无权限处理器
      */
-    @Autowired
-    private UserAuthAccessDeniedHandler userAuthAccessDeniedHandler;
+    private final UserAuthAccessDeniedHandler userAuthAccessDeniedHandler;
     /**
      * 自定义未登录的处理器
      */
-    @Autowired
-    private UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler;
+    private final UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler;
+
+    public SecurityConfig(UserLoginSuccessHandler userLoginSuccessHandler,
+                          UserLoginFailureHandler userLoginFailureHandler,
+                          UserLogoutSuccessHandler userLogoutSuccessHandler,
+                          UserAuthAccessDeniedHandler userAuthAccessDeniedHandler,
+                          UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler) {
+        this.userLoginSuccessHandler = userLoginSuccessHandler;
+        this.userLoginFailureHandler = userLoginFailureHandler;
+        this.userLogoutSuccessHandler = userLogoutSuccessHandler;
+        this.userAuthAccessDeniedHandler = userAuthAccessDeniedHandler;
+        this.userAuthenticationEntryPointHandler = userAuthenticationEntryPointHandler;
+    }
 
     /**
      * 加密方式
@@ -66,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui.html",
                         "/webjars/**").permitAll()
                 //其他的需要登陆后才能访问
-                .anyRequest().authenticated()
+                .anyRequest().hasAuthority(ChatAppSeeder.GENERAL_USER)
                 .and()
                 //配置未登录自定义处理类
                 .httpBasic().authenticationEntryPoint(userAuthenticationEntryPointHandler)

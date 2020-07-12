@@ -3,7 +3,6 @@ package com.dhy.chat.web.handler;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author vghosthunter
+ */
 @Component
 public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    public UserLoginSuccessHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * 登录成功返回结果

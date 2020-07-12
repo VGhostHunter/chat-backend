@@ -10,7 +10,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", indexes = {
+    @Index(name = "idx_username",columnList = "username", unique = true)
+})
 @DynamicUpdate()
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
 public class User extends CreateAndUpdateAuditEntity implements UserDetails {
@@ -19,6 +21,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     @Id
     @GeneratedValue(generator = "jpa-uuid")
+    @Column(name = "id")
     private String id;
 
     private String username;
@@ -35,8 +38,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private boolean locked;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "userId", referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private List<UserAuthority> userAuthorities = new ArrayList<>();
 
     /**
@@ -84,8 +86,11 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
     public void setAuthorities(List<GrantedAuthority> grantedAuthority) {
         this.userAuthorities = grantedAuthority.stream().map(x -> {
             UserAuthority userAuthority = new UserAuthority();
-            userAuthority.setUserId(id);
-            userAuthority.setAuthorityId(((Authority)x).getId());
+            userAuthority.setUser(this);
+            if(x instanceof Authority) {
+                Authority authority = (Authority)x;
+                userAuthority.setAuthority(authority);
+            }
             return userAuthority;
         }).collect(Collectors.toList());
     }

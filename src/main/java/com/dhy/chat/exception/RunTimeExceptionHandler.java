@@ -26,6 +26,13 @@ public class RunTimeExceptionHandler {
         return Result.failure();
     }
 
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result exceptionHandler(BusinessException e){
+        e.printStackTrace();
+        return Result.failure(e.getMessage());
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Result exceptionHandler(EntityNotFoundException e){
