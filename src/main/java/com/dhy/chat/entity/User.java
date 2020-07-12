@@ -29,11 +29,11 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private String picture;
 
-    private Integer isExpired;
+    private boolean isExpired;
 
-    private Integer isEnabled;
+    private boolean isEnabled = true;
 
-    private Integer locked;
+    private boolean locked;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", referencedColumnName = "id")
@@ -44,7 +44,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        return 1 == isExpired;
+        return ! isExpired;
     }
 
     /**
@@ -52,7 +52,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return 1 == locked;
+        return ! locked;
     }
 
     /**
@@ -68,7 +68,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        return 1 == isEnabled;
+        return isEnabled;
     }
 
     /**
@@ -81,8 +81,13 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    public void setAuthorities(List<UserAuthority> userAuthorities) {
-        this.userAuthorities = userAuthorities;
+    public void setAuthorities(List<GrantedAuthority> grantedAuthority) {
+        this.userAuthorities = grantedAuthority.stream().map(x -> {
+            UserAuthority userAuthority = new UserAuthority();
+            userAuthority.setUserId(id);
+            userAuthority.setAuthorityId(((Authority)x).getId());
+            return userAuthority;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -111,28 +116,36 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
         this.password = password;
     }
 
-    public Integer getLocked() {
-        return locked;
-    }
-
-    public void setLocked(Integer locked) {
-        this.locked = locked;
-    }
-
-    public Integer getIsExpired() {
+    public Boolean getExpired() {
         return isExpired;
     }
 
-    public void setIsExpired(Integer isExpired) {
-        this.isExpired = isExpired;
+    public void setExpired(Boolean expired) {
+        isExpired = expired;
     }
 
-    public Integer getIsEnabled() {
+    public Boolean getEnabled() {
         return isEnabled;
     }
 
-    public void setIsEnabled(Integer isEnabled) {
-        this.isEnabled = isEnabled;
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public List<UserAuthority> getUserAuthorities() {
+        return userAuthorities;
+    }
+
+    public void setUserAuthorities(List<UserAuthority> userAuthorities) {
+        this.userAuthorities = userAuthorities;
     }
 
     public String getMobile() {
