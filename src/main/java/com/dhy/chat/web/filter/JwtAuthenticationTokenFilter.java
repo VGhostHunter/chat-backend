@@ -2,7 +2,6 @@ package com.dhy.chat.web.filter;
 
 import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gexin.fastjson.JSONObject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,7 +9,7 @@ import io.jsonwebtoken.Jwts;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,20 +31,26 @@ public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    private static final String signKey = "123456";
+
+    private static final String tokenHeader = "Authorization";
+
+    private static final String tokenPrefix = "Chat-";
+
     public JwtAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 获取请求头中JWT的Token
-        String tokenHeader = request.getHeader("Authorization");
-        if (null != tokenHeader && tokenHeader.startsWith("Chat-")) {
+        String requestHeader = request.getHeader(tokenHeader);
+        if (null != requestHeader && requestHeader.startsWith(tokenPrefix)) {
             try {
                 // 截取JWT前缀
-                String token = tokenHeader.replace("Chat-", "");
+                String token = requestHeader.replace(tokenPrefix, "");
                 // 解析JWT
                 Claims claims = Jwts.parser()
-                        .setSigningKey("123456")
+                        .setSigningKey(signKey)
                         .parseClaimsJws(token)
                         .getBody();
                 // 获取用户名
