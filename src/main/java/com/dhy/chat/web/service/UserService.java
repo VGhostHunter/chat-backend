@@ -13,10 +13,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author vghosthunter
@@ -49,7 +47,7 @@ public class UserService {
     public UserDto createUser(CreateUserDto createUserDto) {
         User isExist = userRepository.findByUsername(createUserDto.getUsername());
         if(isExist != null) {
-            throw new BusinessException("用户已经存在");
+            throw new BusinessException("message.usernameAlreadyExists");
         }
         User user = new User();
         BeanUtils.copyProperties(createUserDto, user);

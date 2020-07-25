@@ -31,7 +31,7 @@ public class UserController {
         return Result.succeeded(userDto);
     }
 
-    @GetMapping("")
+    @GetMapping
     @ApiOperation("Get User")
     private Result<UserDto> get(@RequestParam String username) {
         UserDto userDto = userService.getUserByUsername(username);
