@@ -38,7 +38,7 @@ public class RunTimeExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result exceptionHandler(BusinessException e){
         e.printStackTrace();
-        return Result.failure(messageSource.getMessage(e.getMessage(), null, LocaleContextHolder.getLocale()));
+        return Result.failure(messageSource.getMessage(e.getMessage(), null, e.getMessage(), LocaleContextHolder.getLocale()));
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

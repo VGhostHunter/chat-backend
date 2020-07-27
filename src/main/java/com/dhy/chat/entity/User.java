@@ -32,6 +32,8 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private String picture;
 
+    private String clientId;
+
     private boolean isExpired;
 
     private boolean isEnabled = true;
@@ -119,6 +121,14 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public Boolean getExpired() {
