@@ -5,6 +5,8 @@ import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,6 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * 自定义暂无权限处理器
      */
     private final UserAuthAccessDeniedHandler userAuthAccessDeniedHandler;
+
+    private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
+
     /**
      * 自定义未登录的处理器
      */
@@ -47,12 +52,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           UserLoginFailureHandler userLoginFailureHandler,
                           UserLogoutSuccessHandler userLogoutSuccessHandler,
                           UserAuthAccessDeniedHandler userAuthAccessDeniedHandler,
+                          JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter,
                           UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler) {
         this.userLoginSuccessHandler = userLoginSuccessHandler;
         this.userLoginFailureHandler = userLoginFailureHandler;
         this.userLogoutSuccessHandler = userLogoutSuccessHandler;
         this.userAuthAccessDeniedHandler = userAuthAccessDeniedHandler;
+        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
         this.userAuthenticationEntryPointHandler = userAuthenticationEntryPointHandler;
+    }
+
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     /**
@@ -111,6 +124,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 禁用缓存
         http.headers().cacheControl();
         // 添加JWT过滤器
-        http.addFilter(new JwtAuthenticationTokenFilter(authenticationManager()));
+        http.addFilter(jwtAuthenticationTokenFilter);
     }
 }

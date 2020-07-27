@@ -2,6 +2,7 @@ package com.dhy.chat.web.filter;
 
 import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
+import com.dhy.chat.web.config.properties.JwtProperties;
 import com.gexin.fastjson.JSONObject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,12 +10,13 @@ import io.jsonwebtoken.Jwts;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -27,30 +29,31 @@ import java.util.List;
 /**
  * @author vghosthunter
  */
+@Component
 public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private static final String signKey = "123456";
+    private final JwtProperties jwtProperties;
 
-    private static final String tokenHeader = "Authorization";
-
-    private static final String tokenPrefix = "Chat-";
-
-    public JwtAuthenticationTokenFilter(AuthenticationManager authenticationManager) {
+    public JwtAuthenticationTokenFilter(@Lazy AuthenticationManager authenticationManager,
+                                        JwtProperties jwtProperties) {
         super(authenticationManager);
+        this.jwtProperties = jwtProperties;
     }
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 获取请求头中JWT的Token
-        String requestHeader = request.getHeader(tokenHeader);
-        if (null != requestHeader && requestHeader.startsWith(tokenPrefix)) {
+        String requestHeader = request.getHeader(jwtProperties.getTokenHeader());
+        if (null != requestHeader && requestHeader.startsWith(jwtProperties.getTokenPrefix())) {
             try {
                 // 截取JWT前缀
-                String token = requestHeader.replace(tokenPrefix, "");
+                String token = requestHeader.replace(jwtProperties.getTokenPrefix(), "");
                 // 解析JWT
                 Claims claims = Jwts.parser()
-                        .setSigningKey(signKey)
+                        .setSigningKey(jwtProperties.getSignKey())
                         .parseClaimsJws(token)
                         .getBody();
                 // 获取用户名

@@ -5,6 +5,9 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * @author vghosthunter
+ */
 @Entity
 @Table(name = "user_authority")
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
@@ -16,6 +19,7 @@ public class UserAuthority extends CreateAndUpdateAuditEntity implements Seriali
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "authority_id", referencedColumnName = "id")
     private Authority authority;
+
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

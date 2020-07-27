@@ -6,8 +6,6 @@ spring:
     password: 123456
   jpa:
     show-sql: true
-    hibernate:
-      ddl-auto: update
   data:
     mongodb:
       uri: mongodb://chat:123456@47.107.170.97:27017,47.107.170.97:27018,47.107.170.97:27019/chat?replicaSet=mongos
@@ -19,5 +17,7 @@ jwt:
   tokenHeader: Authorization
   # Token前缀字符
   tokenPrefix: Chat-
+  issuer: chat
+  expiration: 86400000
 
 logging.level.org .springframework.data.mongodb.core: DEBUG

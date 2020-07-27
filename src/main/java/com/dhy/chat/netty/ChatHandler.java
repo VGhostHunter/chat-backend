@@ -4,8 +4,9 @@ import com.dhy.chat.dto.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.enums.MsgActionEnum;
 import com.dhy.chat.utils.SpringUtils;
+import com.dhy.chat.web.config.properties.JwtProperties;
+import com.dhy.chat.web.service.IChatMsgService;
 import com.dhy.chat.web.service.IPushService;
-import com.dhy.chat.web.service.impl.ChatMsgServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gexin.rp.sdk.base.IPushResult;
@@ -26,7 +27,20 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * @author vghosthunter
+ */
 public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+
+    private final IChatMsgService chatMsgService;
+    private final IPushService pushService;
+    private final JwtProperties jwtProperties;
+
+    public ChatHandler() {
+        chatMsgService = (IChatMsgService) SpringUtils.getBean("chatMsgService");
+        pushService = (IPushService) SpringUtils.getBean("pushServiceImpl");
+        jwtProperties = (JwtProperties) SpringUtils.getBean("jwtProperties");
+    }
 
     /**
      * 用于记录和管理所有客户端的channel
@@ -67,9 +81,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
     private void sign(Channel currentChannel, DataContent dataContent) {
         // 签收消息类型，针对具体的消息进行签收，修改数据库中对应消息的签收状态[已签收]
-        ChatMsgServiceImpl chatMsgService = (ChatMsgServiceImpl)SpringUtils.getBean("chatMsgService");
         // 扩展字段在signed类型的消息中，代表需要去签收的消息id，逗号间隔
-
         List<String> msgIdList = Arrays.asList(dataContent.getSignIds().split(","));
         if (msgIdList.size() > 0) {
             // 批量签收
@@ -82,7 +94,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
         ChatMsg chatMsg = new ChatMsg();
         BeanUtils.copyProperties(dataContent.getChatMsg(), chatMsg);
         // 保存消息到MongoDb，并且标记为 未签收
-        ChatMsgServiceImpl chatMsgService = (ChatMsgServiceImpl) SpringUtils.getBean("chatMsgService");
         ChatMsgDto dto = chatMsgService.saveChatMsg(chatMsg);
 
         // 发送消息
@@ -109,7 +120,6 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     }
 
     private void push(ChatMsgDto dto) {
-        IPushService pushService = (IPushService)SpringUtils.getBean("pushServiceImpl");
         IPushResult ret = pushService.pushMessageToSingle(dto);
         if(ret == null) {
             Channel channel = getChanel(dto.getSendUserId());
@@ -123,13 +133,12 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     }
 
     private void connect(Channel currentChannel, DataContent dataContent) {
-        //TODO
         //认证
         // 截取JWT前缀
-        String token = dataContent.getToken().replace("Chat-", "");
+        String token = dataContent.getToken().replace(jwtProperties.getTokenPrefix(), "");
         // 解析JWT
         Claims claims = Jwts.parser()
-                .setSigningKey("123456")
+                .setSigningKey(jwtProperties.getSignKey())
                 .parseClaimsJws(token)
                 .getBody();
         // 获取用户名
