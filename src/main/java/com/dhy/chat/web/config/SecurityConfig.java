@@ -5,6 +5,7 @@ import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -83,12 +84,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 //不进行权限验证的请求或资源(从配置文件中读取)
-                .antMatchers("/user/create", "/user/login", "/favicon.ico").permitAll()
-                .antMatchers("/v2/api-docs",
-                        "/swagger-resources/configuration/ui",
-                        "/swagger-resources",
-                        "/swagger-resources/configuration/security",
-                        "/swagger-ui.html",
+                .antMatchers("/api/user/create", "/api/user/login", "/favicon.ico").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui.html",
+                        "/swagger-ui/*",
+                        "/swagger-resources/**",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
                         "/webjars/**").permitAll()
                 //其他的需要登陆后才能访问
                 .anyRequest().hasAuthority(ChatAppSeeder.GENERAL_USER)

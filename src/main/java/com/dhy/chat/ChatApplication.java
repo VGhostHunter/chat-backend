@@ -25,7 +25,6 @@ import java.text.SimpleDateFormat;
  * 构造器中可以添加对象初始化的校验逻辑。
  * 可以清楚的区分对象是通过setter方法注入的（非final对象）还是通过强制依赖注入的（final对象）
  */
-@EnableSwagger2
 @EnableMongoAuditing
 @EnableJpaAuditing
 @SpringBootApplication
@@ -33,19 +32,6 @@ public class ChatApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ChatApplication.class, args);
-    }
-
-    @Bean
-    public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .pathMapping("/")
-                .select()
-                .paths(PathSelectors.any())
-                .build().apiInfo(new ApiInfoBuilder()
-                        .title("API 1.0")
-                        .description("Chat Api")
-                        .version("1.0")
-                        .build());
     }
 
     @Bean

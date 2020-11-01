@@ -6,6 +6,7 @@ import com.dhy.chat.dto.UserDto;
 import com.dhy.chat.web.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,7 +15,7 @@ import javax.validation.Valid;
  * @author vghosthunter
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @Api("User")
 public class UserController {
 
@@ -27,7 +28,7 @@ public class UserController {
 
     @PostMapping("/create")
     @ApiOperation("Create User")
-    private Result<UserDto> create(@Valid @RequestBody CreateUserDto createUserDto) {
+    private Result<UserDto> create(@Validated @RequestBody CreateUserDto createUserDto) {
         UserDto userDto = userService.createUser(createUserDto);
         return Result.succeeded(userDto);
     }
