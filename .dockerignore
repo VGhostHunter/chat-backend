@@ -11,20 +11,10 @@ docker-compose.*.yml
 **/bin
 **/obj
 
-#Nuget packages folder
-**/packages
-
-**/App_Data
-**/Upload
-**/Temp
-
-**/node_modules
-
-crawler
-deployment
 **/Logs
 
 *.iws
 *.iml
 *.ipr
-chat/target/
+./target/
+
