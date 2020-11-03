@@ -1,4 +1,4 @@
-package com.dhy.chat.web.service;
+package com.dhy.chat.web.service.impl;
 
 import com.dhy.chat.ChatAppSeeder;
 import com.dhy.chat.dto.CreateUserDto;
@@ -8,34 +8,38 @@ import com.dhy.chat.entity.User;
 import com.dhy.chat.exception.BusinessException;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
+import com.dhy.chat.web.service.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author vghosthunter
  */
 @Service
-public class UserService {
+public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthorityRepository authorityRepository;
 
-    public UserService(UserRepository userRepository,
-                       BCryptPasswordEncoder passwordEncoder,
-                       AuthorityRepository authorityRepository) {
+    public UserServiceImpl(UserRepository userRepository,
+                           BCryptPasswordEncoder passwordEncoder,
+                           AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.SUPPORTS)
     public UserDto getUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if(user == null) {
@@ -46,10 +50,12 @@ public class UserService {
         return userDto;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public UserDto createUser(CreateUserDto createUserDto) {
         User isExist = userRepository.findByUsername(createUserDto.getUsername());
         if(isExist != null) {
-            throw new BusinessException("用户已经存在");
+            throw new BusinessException("message.usernameAlreadyExists");
         }
         User user = new User();
         BeanUtils.copyProperties(createUserDto, user);
@@ -63,5 +69,19 @@ public class UserService {
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
         return userDto;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateClientId(String id, String clientId) {
+        User user = userRepository.getOne(id);
+        user.setClientId(clientId);
+        userRepository.save(user);
+    }
+
+    @Override
+    public Set<String> getUserClientIds(List<String> userIds) {
+        Set<String> distinctClientIdByIdIn = userRepository.findDistinctClientIdByIdIn(userIds);
+        return distinctClientIdByIdIn;
     }
 }

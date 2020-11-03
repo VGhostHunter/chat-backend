@@ -2,6 +2,10 @@ package com.dhy.chat.web.repository;
 
 import com.dhy.chat.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author vghosthunter
@@ -14,4 +18,12 @@ public interface UserRepository extends JpaRepository<User, String> {
      * @return User
      */
     User findByUsername(String username);
+
+    /**
+     * findDistinctClientIdByIdIn
+     * @param userIds userIds
+     * @return
+     */
+    @Query("select distinct u.clientId from User u where u.id in ?1")
+    Set<String> findDistinctClientIdByIdIn(List<String> userIds);
 }

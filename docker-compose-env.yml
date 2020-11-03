@@ -1,7 +1,7 @@
 version: "3.3"
 services:
   mysql:
-    image: 'mysql:5.7'
+    image: 'mysql:8.0.22'
     volumes:
       - /data/mysql:/var/lib/mysql
     env_file: .env
@@ -10,15 +10,18 @@ services:
     ports:
       - '3306:3306'
     restart: always
+    container_name: mysql
     command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--sort_buffer_size=8M']
+    networks:
+      - chat-backend
   mongodb1:
     image: mongo
     restart: always
     container_name: mongo1
     volumes:
-      - /data/mongo1:/data/db
-      - /data/mongoenv/mongodb.key:/data/mongodb.key
-      - /data/mongoenv/setup.sh:/data/setup.sh
+      - /data/mongo/mongo1:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27017:27017
     env_file: .env
@@ -27,7 +30,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     command: mongod --replSet mongos --keyFile /data/mongodb.key
     networks:
-      - backend
+      - chat-backend
     entrypoint:
       - bash
       - -c
@@ -40,9 +43,9 @@ services:
     restart: always
     container_name: mongo2
     volumes:
-      - /data/mongo2:/data/db
-      - /data/mongoenv/mongodb.key:/data/mongodb.key
-      - /data/mongoenv/setup.sh:/data/setup.sh
+      - /data/mongo/mongo2:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27018:27017
     env_file: .env
@@ -51,7 +54,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     command: mongod --replSet mongos --keyFile /data/mongodb.key
     networks:
-      - backend
+      - chat-backend
     entrypoint:
       - bash
       - -c
@@ -64,9 +67,9 @@ services:
     restart: always
     container_name: mongo3
     volumes:
-      - /data/mongo3:/data/db
-      - /data/mongoenv/mongodb.key:/data/mongodb.key
-      - /data/mongoenv/setup.sh:/data/setup.sh
+      - /data/mongo/mongo3:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
     ports:
       - 27019:27017
     env_file: .env
@@ -75,7 +78,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     networks:
-      - backend
+      - chat-backend
     entrypoint:
       - bash
       - -c
@@ -84,5 +87,5 @@ services:
         chown 999:999 /data/mongodb.key
         exec docker-entrypoint.sh $$@
 networks:
-  backend:
+  chat-backend:
     driver: bridge

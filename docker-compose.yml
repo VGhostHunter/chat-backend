@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+
+  chat-backend:
+    image: ${DOCKER_REGISTRY}/chat-backend
+   # build:
+   #   context: .
+   #   dockerfile: ./Dockerfile
+    ports:
+      - "62519:62519"
+      - "62520:62520"
+    env_file:
+      - '.env'
+    container_name: chat-backend
+    networks:
+      - chat-backend
+
+networks:
+  chat-backend:
+    driver: bridge

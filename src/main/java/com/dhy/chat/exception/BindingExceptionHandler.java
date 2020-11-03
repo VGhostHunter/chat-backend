@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * @author vghosthunter
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 public class BindingExceptionHandler {
 
     private Logger log = LoggerFactory.getLogger(getClass());

@@ -2,6 +2,7 @@ package com.dhy.chat.web.handler;
 
 import com.dhy.chat.entity.User;
 import com.dhy.chat.utils.JwtTokenUtil;
+import com.dhy.chat.web.config.properties.JwtProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -20,9 +21,15 @@ import java.util.Map;
 public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtProperties jwtProperties;
 
-    public UserLoginSuccessHandler(ObjectMapper objectMapper) {
+    public UserLoginSuccessHandler(ObjectMapper objectMapper,
+                                   JwtTokenUtil jwtTokenUtil,
+                                   JwtProperties jwtProperties) {
         this.objectMapper = objectMapper;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.jwtProperties = jwtProperties;
     }
 
     /**
@@ -32,8 +39,8 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         // 组装JWT
         User user =  (User) authentication.getPrincipal();
-        String token = JwtTokenUtil.createAccessToken(user);
-        token = "Chat-" + token;
+        String token = jwtTokenUtil.createAccessToken(user);
+        token = jwtProperties.getTokenPrefix() + token;
 
         // 封装返回参数
         Map<String,Object> resultData = new HashMap<>();

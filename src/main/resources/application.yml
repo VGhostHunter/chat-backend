@@ -4,6 +4,8 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
+  messages:
+    basename: i18n.message
   profiles:
     active: dev
 server:
