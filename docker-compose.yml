@@ -137,4 +137,4 @@ services:
 
 networks:
   chat-backend:
-    driver: bridge
+    driver: overlay
