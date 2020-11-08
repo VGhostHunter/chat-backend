@@ -8,6 +8,7 @@ services:
     ports:
       - "62519:62519"
       - "62520:62520"
+    #docker-compose 支持env_file docker swarm不支持 docker swarm 需要配置对应的环境变量
     env_file:
       - '.env'
     container_name: chat-backend
