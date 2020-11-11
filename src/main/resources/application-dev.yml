@@ -8,7 +8,7 @@ spring:
     show-sql: true
   data:
     mongodb:
-      uri: mongodb://chat:123456@mongo1:27017,mongo2:27018,mongo3:27019/chat?replicaSet=mongos
+      uri: mongodb://chat:123456@mongodb1:27017,mongodb2:27017,mongodb3:27017/chat?replicaSet=mongos
 
 
 logging.level.org .springframework.data.mongodb.core: DEBUG
