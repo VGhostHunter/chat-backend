@@ -1,6 +1,8 @@
 # chat-backend
 a chat application backend
 
+#docker-compose 支持env_file docker swarm不支持 docker swarm 需要配置对应的环境变量
+docker swarm 不会自动创建对应的volume 可以使用docker-compose先拉起对应的服务或者手动创建volume文件夹
 
 #start 
 1.use docker-compose:  run docker-compose up -d 
