@@ -14,3 +14,4 @@ docker swarm 不会自动创建对应的volume 可以使用docker-compose先拉�
 #use docker-swarm
 export DOCKER_REGISTRY=registry.cn-shanghai.aliyuncs.com/haoyuv
 docker stack deploy 'chat' --compose-file=docker-compose.yml
+
