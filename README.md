@@ -1,7 +1,6 @@
 # chat-backend
 a chat application backend
 
-
 #start 
 1.use docker-compose:  run docker-compose up -d 
 2.generatorkey: openssl rand -base64 756 > mongodb.key
