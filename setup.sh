@@ -3,9 +3,9 @@ mongo -u admin -p 123456 << EOF
 rs.initiate({
     _id: "mongos",
     members: [
-        { _id : 0, host : "mongo1:27017" },
-        { _id : 1, host : "mongo2:27017" },
-        { _id : 2, host : "mongo3:27017" }
+        { _id : 0, host : "mongodb1:27017" },
+        { _id : 1, host : "mongodb2:27017" },
+        { _id : 2, host : "mongodb3:27017" }
     ]
 });
 use admin

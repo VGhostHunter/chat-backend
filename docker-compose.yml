@@ -1,12 +1,10 @@
 version: '3.3'
-
 services:
-
   chat-backend:
     image: ${DOCKER_REGISTRY}/chat-backend
-   # build:
-   #   context: .
-   #   dockerfile: ./Dockerfile
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     ports:
       - "62519:62519"
       - "62520:62520"
@@ -15,7 +13,146 @@ services:
     container_name: chat-backend
     networks:
       - chat-backend
+    depends_on:
+      - mysql
+      - mongodb1
+      - mongodb2
+      - mongodb3
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+
+  nginx:
+    restart: always
+    image: nginx
+    container_name: chat-nginx
+    networks:
+      - chat-backend
+    ports:
+    - "80:80"
+    - "443:443"
+    volumes:
+      - /data/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /data/nginx/conf.d:/etc/nginx/conf.d
+      - /data/nginx/log:/var/log/nginx
+      - /data/nginx/html:/usr/share/nginx/html
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  mysql:
+    image: 'mysql:8.0.22'
+    volumes:
+      - /data/mysql:/var/lib/mysql
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - '3306:3306'
+    restart: always
+    container_name: mysql
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci', '--sort_buffer_size=8M']
+    networks:
+      - chat-backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+
+  mongodb1:
+    image: mongo
+    restart: always
+    container_name: mongo1
+    volumes:
+      - /data/mongo/mongo1:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
+    ports:
+      - 27017:27017
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    networks:
+      - chat-backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+
+  mongodb2:
+    image: mongo
+    restart: always
+    container_name: mongo2
+    volumes:
+      - /data/mongo/mongo2:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
+    ports:
+      - 27018:27017
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    networks:
+      - chat-backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+
+  mongodb3:
+    image: mongo
+    restart: always
+    container_name: mongo3
+    volumes:
+      - /data/mongo/mongo3:/data/db
+      - /data/mongo/mongoenv/mongodb.key:/data/mongodb.key
+      - /data/mongo/mongoenv/setup.sh:/data/setup.sh
+    ports:
+      - 27019:27017
+    env_file: .env
+    command: mongod --replSet mongos --keyFile /data/mongodb.key
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - chat-backend
+    entrypoint:
+      - bash
+      - -c
+      - |
+        chmod 400 /data/mongodb.key
+        chown 999:999 /data/mongodb.key
+        exec docker-entrypoint.sh $$@
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
 
 networks:
   chat-backend:
-    driver: bridge
+    driver: overlay
