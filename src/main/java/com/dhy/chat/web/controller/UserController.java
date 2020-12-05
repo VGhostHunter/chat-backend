@@ -1,6 +1,7 @@
 package com.dhy.chat.web.controller;
 
 import com.dhy.chat.dto.CreateUserDto;
+import com.dhy.chat.dto.LoginDto;
 import com.dhy.chat.dto.Result;
 import com.dhy.chat.dto.UserDto;
 import com.dhy.chat.web.service.IUserService;
@@ -49,11 +50,9 @@ public class UserController {
 
     /**
      * 只是为了生成api
-     * @param username
-     * @param password
      */
     @PostMapping("/login")
     @ApiOperation("User Login")
-    private void login(@RequestParam() String username, @RequestParam String password) {
+    private void login(LoginDto input) {
     }
 }

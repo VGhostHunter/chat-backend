@@ -19,3 +19,12 @@ chat:
   masterSecret: masterSecret
   url: http://sdk.open.api.igexin.com/apiex.htm
 
+# JWT配置
+jwt:
+  signKey: 123456
+  # HeaderKEY
+  tokenHeader: Authorization
+  # Token前缀字符
+  tokenPrefix: Chat-
+  issuer: chat
+  expiration: 86400000

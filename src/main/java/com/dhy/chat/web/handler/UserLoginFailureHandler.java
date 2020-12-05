@@ -45,11 +45,11 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
 
         } else if (exception instanceof LockedException){
             log.info("【登录失败】"+exception.getMessage());
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户被冻结")));
         } else if (exception instanceof BadCredentialsException){
             log.info("【登录失败】"+exception.getMessage());
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户名密码不正确")));
         } else {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

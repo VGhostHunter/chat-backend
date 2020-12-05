@@ -10,14 +10,5 @@ spring:
     mongodb:
       uri: mongodb://chat:123456@mongo1:27017,mongo2:27018,mongo3:27019/chat?replicaSet=mongos
 
-# JWT配置
-jwt:
-  signKey: 123456
-  # HeaderKEY
-  tokenHeader: Authorization
-  # Token前缀字符
-  tokenPrefix: Chat-
-  issuer: chat
-  expiration: 86400000
 
 logging.level.org .springframework.data.mongodb.core: DEBUG

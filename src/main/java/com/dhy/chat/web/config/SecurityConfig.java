@@ -2,18 +2,23 @@ package com.dhy.chat.web.config;
 
 import com.dhy.chat.ChatAppSeeder;
 import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
+import com.dhy.chat.web.filter.RestAuthenticationFilter;
 import com.dhy.chat.web.handler.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Configuration
@@ -42,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     private final UserAuthAccessDeniedHandler userAuthAccessDeniedHandler;
 
+    private final ObjectMapper objectMapper;
+
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
     /**
@@ -53,12 +60,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           UserLoginFailureHandler userLoginFailureHandler,
                           UserLogoutSuccessHandler userLogoutSuccessHandler,
                           UserAuthAccessDeniedHandler userAuthAccessDeniedHandler,
+                          ObjectMapper objectMapper,
                           JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter,
                           UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler) {
         this.userLoginSuccessHandler = userLoginSuccessHandler;
         this.userLoginFailureHandler = userLoginFailureHandler;
         this.userLogoutSuccessHandler = userLogoutSuccessHandler;
         this.userAuthAccessDeniedHandler = userAuthAccessDeniedHandler;
+        this.objectMapper = objectMapper;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
         this.userAuthenticationEntryPointHandler = userAuthenticationEntryPointHandler;
     }
@@ -77,48 +86,55 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public RestAuthenticationFilter restAuthenticationFilter() throws Exception {
+        RestAuthenticationFilter filter = new RestAuthenticationFilter(objectMapper);
+        filter.setAuthenticationSuccessHandler(userLoginSuccessHandler);
+        filter.setAuthenticationFailureHandler(userLoginFailureHandler);
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setFilterProcessesUrl("/api/user/login");
+        return filter;
+    }
+
     /**
      * 配置security的控制逻辑
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                //不进行权限验证的请求或资源(从配置文件中读取)
-                .antMatchers("/api/user/create", "/api/user/login", "/favicon.ico").permitAll()
-                .antMatchers(HttpMethod.GET, "/swagger-ui.html",
-                        "/swagger-ui/*",
-                        "/swagger-resources/**",
-                        "/v2/api-docs",
-                        "/v3/api-docs",
-                        "/webjars/**").permitAll()
-                //其他的需要登陆后才能访问
-                .anyRequest().hasAuthority(ChatAppSeeder.GENERAL_USER)
-                .and()
+        http.authorizeRequests(req -> req.antMatchers("/api/user/create", "/api/user/login", "/favicon.ico").permitAll()
+                    .antMatchers(HttpMethod.GET, "/swagger-ui.html",
+                            "/swagger-ui/*",
+                            "/swagger-resources/**",
+                            "/v2/api-docs",
+                            "/v3/api-docs",
+                            "/webjars/**").permitAll()
+                    .antMatchers("/api/**").hasAuthority(ChatAppSeeder.GENERAL_USER)
+                    .anyRequest().authenticated()
+                )
+                .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 //配置未登录自定义处理类
-                .httpBasic().authenticationEntryPoint(userAuthenticationEntryPointHandler)
-                .and()
-                //配置登录地址
-                .formLogin()
-                .loginProcessingUrl("/user/login")
-                //配置登录成功自定义处理类
-                .successHandler(userLoginSuccessHandler)
-                //配置登录失败自定义处理类
-                .failureHandler(userLoginFailureHandler)
-                .and()
+                .httpBasic(basic -> basic.authenticationEntryPoint(userAuthenticationEntryPointHandler))
+//                配置登录地址
+//                .formLogin()
+//                .loginProcessingUrl("/user/login")
+//                配置登录成功自定义处理类
+//                .successHandler(userLoginSuccessHandler)
+//                配置登录失败自定义处理类
+//                .failureHandler(userLoginFailureHandler)
+//                .and()
                 //配置登出地址
-                .logout()
-                .logoutUrl("/user/logout")
-                //配置用户登出自定义处理类
-                .logoutSuccessHandler(userLogoutSuccessHandler)
-                .and()
+                .logout(logout -> logout.logoutUrl("/user/logout")
+                        //配置用户登出自定义处理类
+                        .logoutSuccessHandler(userLogoutSuccessHandler)
+                )
                 //配置没有权限自定义处理类
-                .exceptionHandling().accessDeniedHandler(userAuthAccessDeniedHandler)
-                .and()
+                .exceptionHandling(
+                        ex -> ex.accessDeniedHandler(userAuthAccessDeniedHandler)
+                )
                 // 开启跨域
-                .cors()
-                .and()
+                .cors(Customizer.withDefaults())
                 // 取消跨站请求伪造防护
-                .csrf().disable();
+                .csrf(AbstractHttpConfigurer::disable);
 
         // 基于Token不需要session
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
