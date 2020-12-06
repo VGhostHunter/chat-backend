@@ -3,14 +3,23 @@ package com.dhy.chat.dto;
 import io.swagger.annotations.ApiModel;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+/**
+ * @author vghosthunter
+ */
 @ApiModel("CreateUserDto")
 public class CreateUserDto {
 
+    @NotNull
     @NotBlank
+    @Size(min = 4, max = 50)
     private String username;
 
+    @NotNull
     @NotBlank
+    @Size(min = 4, max = 50)
     private String password;
 
     private String mobile;

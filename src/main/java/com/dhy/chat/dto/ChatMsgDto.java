@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
+/**
+ * @author vghosthunter
+ */
 public class ChatMsgDto {
 
     private String id;

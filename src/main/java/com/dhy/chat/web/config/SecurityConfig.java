@@ -6,7 +6,6 @@ import com.dhy.chat.web.filter.RestAuthenticationFilter;
 import com.dhy.chat.web.handler.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -16,17 +15,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
-@Configuration
-@EnableWebSecurity
 /**
  * @author vghosthunter
  * 开启权限注解,默认是关闭的
  */
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
@@ -111,36 +109,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/api/**").hasAuthority(ChatAppSeeder.GENERAL_USER)
                     .anyRequest().authenticated()
                 )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(userAuthenticationEntryPointHandler)
+                        .accessDeniedHandler(userAuthAccessDeniedHandler))
+                // 基于Token不需要session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                //配置未登录自定义处理类
-                .httpBasic(basic -> basic.authenticationEntryPoint(userAuthenticationEntryPointHandler))
-//                配置登录地址
-//                .formLogin()
-//                .loginProcessingUrl("/user/login")
-//                配置登录成功自定义处理类
-//                .successHandler(userLoginSuccessHandler)
-//                配置登录失败自定义处理类
-//                .failureHandler(userLoginFailureHandler)
-//                .and()
+                // 添加JWT过滤器
+                .addFilter(jwtAuthenticationTokenFilter)
+                // 禁用缓存
+                .headers(HeadersConfigurer::cacheControl)
                 //配置登出地址
                 .logout(logout -> logout.logoutUrl("/user/logout")
                         //配置用户登出自定义处理类
                         .logoutSuccessHandler(userLogoutSuccessHandler)
                 )
-                //配置没有权限自定义处理类
-                .exceptionHandling(
-                        ex -> ex.accessDeniedHandler(userAuthAccessDeniedHandler)
-                )
                 // 开启跨域
                 .cors(Customizer.withDefaults())
                 // 取消跨站请求伪造防护
                 .csrf(AbstractHttpConfigurer::disable);
-
-        // 基于Token不需要session
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        // 禁用缓存
-        http.headers().cacheControl();
-        // 添加JWT过滤器
-        http.addFilter(jwtAuthenticationTokenFilter);
     }
 }

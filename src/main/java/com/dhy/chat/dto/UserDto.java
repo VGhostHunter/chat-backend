@@ -1,5 +1,8 @@
 package com.dhy.chat.dto;
 
+/**
+ * @author vghosthunter
+ */
 public class UserDto {
 
     private String id;

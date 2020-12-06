@@ -1,0 +1,14 @@
+@password=123456
+
+###
+GET http://localhost:62519/api/user?username=jack HTTP/1.1
+Authorization: Chat-eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiJmZjgwODA4MTczOTA4MzMyMDE3MzkwODQxMmFlMDAwMSIsInN1YiI6ImphY2siLCJpYXQiOjE2MDcxODQxMDUsImlzcyI6ImNoYXQiLCJhdXRob3JpdGllcyI6IltcIkdlbmVyYWxVc2VyXCJdIiwiZXhwIjoxNjA3MjcwNTA1fQ.RL-gN6NBkPMwW_l4Dk1RGTsfEAcmTTJCS8VIb9BLcvhQ7PcUFUHOhEp5Y50U9NkMgxhOgW6lPBsQpD1_VU-sDA
+
+###
+POST http://localhost:62519/api/user/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "username": "jack",
+  "password": "111111"
+}

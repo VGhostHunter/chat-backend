@@ -53,6 +53,6 @@ public class UserController {
      */
     @PostMapping("/login")
     @ApiOperation("User Login")
-    private void login(LoginDto input) {
+    private void login(@Validated @RequestBody LoginDto input) {
     }
 }
