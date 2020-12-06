@@ -26,6 +26,13 @@ public interface IUserService {
     UserDto createUser(CreateUserDto createUserDto);
 
     /**
+     * getById
+     * @param id
+     * @return UserDto
+     */
+    UserDto getById(String id);
+
+    /**
      * updateClientId
      * @param id id
      * @param clientId clientId

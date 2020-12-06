@@ -35,9 +35,16 @@ public class UserController {
     }
 
     @GetMapping
-    @ApiOperation("Get User")
+    @ApiOperation("Get User By Username")
     private Result<UserDto> get(@RequestParam String username) {
         UserDto userDto = userService.getUserByUsername(username);
+        return Result.succeeded(userDto);
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation("Get User By Id")
+    private Result<UserDto> getById(@PathVariable String id) {
+        UserDto userDto = userService.getById(id);
         return Result.succeeded(userDto);
     }
 

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -68,6 +69,14 @@ public class UserServiceImpl implements IUserService {
 
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
+        return userDto;
+    }
+
+    @Override
+    public UserDto getById(String id) {
+        Optional<User> user = userRepository.findById(id);
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user.get(), userDto);
         return userDto;
     }
 

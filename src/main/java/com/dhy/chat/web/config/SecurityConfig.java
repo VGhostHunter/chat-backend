@@ -1,11 +1,15 @@
 package com.dhy.chat.web.config;
 
 import com.dhy.chat.ChatAppSeeder;
+import com.dhy.chat.entity.User;
+import com.dhy.chat.web.filter.AuditFilter;
 import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.filter.RestAuthenticationFilter;
 import com.dhy.chat.web.handler.*;
+import com.dhy.chat.web.repository.AuditLogRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
@@ -17,8 +21,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Optional;
 
 /**
  * @author vghosthunter
@@ -34,6 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * 自定义登录失败处理器
      */
+
+    private final AuditLogRepository auditLogRepository;
 
     private final UserLoginFailureHandler userLoginFailureHandler;
     /**
@@ -55,6 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler;
 
     public SecurityConfig(UserLoginSuccessHandler userLoginSuccessHandler,
+                          AuditLogRepository auditLogRepository,
                           UserLoginFailureHandler userLoginFailureHandler,
                           UserLogoutSuccessHandler userLogoutSuccessHandler,
                           UserAuthAccessDeniedHandler userAuthAccessDeniedHandler,
@@ -62,6 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter,
                           UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler) {
         this.userLoginSuccessHandler = userLoginSuccessHandler;
+        this.auditLogRepository = auditLogRepository;
         this.userLoginFailureHandler = userLoginFailureHandler;
         this.userLogoutSuccessHandler = userLogoutSuccessHandler;
         this.userAuthAccessDeniedHandler = userAuthAccessDeniedHandler;
@@ -94,6 +106,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return filter;
     }
 
+    @Bean
+    public AuditFilter auditFilter() {
+        return new AuditFilter(auditLogRepository);
+    }
+
+    @Bean
+    public AuditorAware<String> auditorAware() {
+        return new AuditorAware<String>() {
+            @Override
+            public Optional<String> getCurrentAuditor() {
+                if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+                    var userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+                    return Optional.ofNullable(userId);
+                }
+                return Optional.empty();
+            }
+        };
+    }
+
     /**
      * 配置security的控制逻辑
      */
@@ -115,6 +146,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 基于Token不需要session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(auditFilter(), FilterSecurityInterceptor.class)
                 // 添加JWT过滤器
                 .addFilter(jwtAuthenticationTokenFilter)
                 // 禁用缓存

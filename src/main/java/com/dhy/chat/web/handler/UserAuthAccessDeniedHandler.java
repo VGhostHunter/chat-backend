@@ -1,6 +1,8 @@
 package com.dhy.chat.web.handler;
 
 import com.dhy.chat.dto.Result;
+import com.dhy.chat.entity.AuditLog;
+import com.dhy.chat.web.repository.AuditLogRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,9 +21,12 @@ import java.io.IOException;
 public class UserAuthAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
+    private final AuditLogRepository auditLogRepository;
 
-    public UserAuthAccessDeniedHandler(ObjectMapper objectMapper) {
+    public UserAuthAccessDeniedHandler(ObjectMapper objectMapper,
+                                       AuditLogRepository auditLogRepository) {
         this.objectMapper = objectMapper;
+        this.auditLogRepository = auditLogRepository;
     }
 
     /**
@@ -29,6 +34,12 @@ public class UserAuthAccessDeniedHandler implements AccessDeniedHandler {
      */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) throws IOException {
+        String id = (String) request.getAttribute("auditLogId");
+        AuditLog a = auditLogRepository.findById(id).get();
+        a.setStatus(HttpStatus.FORBIDDEN.value());
+
+        auditLogRepository.save(a);
+
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.FORBIDDEN, "暂无权限")));
