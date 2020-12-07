@@ -1,6 +1,9 @@
 package com.dhy.chat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,9 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "user", indexes = {
-    @Index(name = "idx_username",columnList = "username", unique = true)
-})
+@Table(name = "user")
 @DynamicUpdate()
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
 public class User extends CreateAndUpdateAuditEntity implements UserDetails {
@@ -24,6 +25,7 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
     @Column(name = "id")
     private String id;
 
+    @Column(unique = true)
     private String username;
 
     private String mobile;
@@ -40,8 +42,16 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private boolean locked;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
-    private List<UserAuthority> userAuthorities = new ArrayList<>();
+    /**
+     * 角色列表，使用 Set 确保不重复
+     */
+    @ManyToMany
+    @Fetch(FetchMode.JOIN)
+    @JoinTable(
+            name = "user_authority",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "authority_id", referencedColumnName = "id")})
+    private Set<Authority> authorities;
 
     /**
      * 账户是否过期
@@ -79,22 +89,12 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
      * 权限
      */
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return userAuthorities.stream()
-                .map(UserAuthority::getAuthority)
-                .collect(Collectors.toList());
+    public Set<Authority> getAuthorities() {
+        return authorities;
     }
 
-    public void setAuthorities(List<GrantedAuthority> grantedAuthority) {
-        this.userAuthorities = grantedAuthority.stream().map(x -> {
-            UserAuthority userAuthority = new UserAuthority();
-            userAuthority.setUser(this);
-            if(x instanceof Authority) {
-                Authority authority = (Authority)x;
-                userAuthority.setAuthority(authority);
-            }
-            return userAuthority;
-        }).collect(Collectors.toList());
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
@@ -153,14 +153,6 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     public void setLocked(Boolean locked) {
         this.locked = locked;
-    }
-
-    public List<UserAuthority> getUserAuthorities() {
-        return userAuthorities;
-    }
-
-    public void setUserAuthorities(List<UserAuthority> userAuthorities) {
-        this.userAuthorities = userAuthorities;
     }
 
     public String getMobile() {

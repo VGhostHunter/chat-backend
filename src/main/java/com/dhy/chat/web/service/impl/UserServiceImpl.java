@@ -10,16 +10,13 @@ import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
 import com.dhy.chat.web.service.IUserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import javax.persistence.EntityNotFoundException;
+import java.util.*;
 
 /**
  * @author vghosthunter
@@ -61,7 +58,7 @@ public class UserServiceImpl implements IUserService {
         User user = new User();
         BeanUtils.copyProperties(createUserDto, user);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        List<GrantedAuthority> defaultRole = new ArrayList();
+        Set<Authority> defaultRole = new HashSet<>();
         Authority auth = authorityRepository.findByAuthority(ChatAppSeeder.GENERAL_USER);
         defaultRole.add(auth);
         user.setAuthorities(defaultRole);
@@ -74,9 +71,10 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDto getById(String id) {
-        Optional<User> user = userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(EntityNotFoundException::new);
         UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user.get(), userDto);
+        BeanUtils.copyProperties(user, userDto);
         return userDto;
     }
 

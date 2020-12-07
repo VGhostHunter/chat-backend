@@ -7,13 +7,16 @@ import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.filter.RestAuthenticationFilter;
 import com.dhy.chat.web.handler.*;
 import com.dhy.chat.web.repository.AuditLogRepository;
+import com.dhy.chat.web.service.impl.UserDetailServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,6 +25,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -59,6 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    private final UserDetailServiceImpl userDetailsService;
+
     /**
      * 自定义未登录的处理器
      */
@@ -71,6 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                           UserAuthAccessDeniedHandler userAuthAccessDeniedHandler,
                           ObjectMapper objectMapper,
                           JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter,
+                          UserDetailServiceImpl userDetailsService,
                           UserAuthenticationEntryPointHandler userAuthenticationEntryPointHandler) {
         this.userLoginSuccessHandler = userLoginSuccessHandler;
         this.auditLogRepository = auditLogRepository;
@@ -79,6 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.userAuthAccessDeniedHandler = userAuthAccessDeniedHandler;
         this.objectMapper = objectMapper;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.userDetailsService = userDetailsService;
         this.userAuthenticationEntryPointHandler = userAuthenticationEntryPointHandler;
     }
 
@@ -123,6 +131,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 return Optional.empty();
             }
         };
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        var daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
+        return daoAuthenticationProvider;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
+        //配置其他自定义的provider
     }
 
     /**

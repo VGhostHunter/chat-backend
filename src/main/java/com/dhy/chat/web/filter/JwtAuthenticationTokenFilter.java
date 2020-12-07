@@ -24,7 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author vghosthunter
@@ -61,7 +63,7 @@ public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
                 String userId = claims.getId();
                 if(!StringUtils.isEmpty(username) && !StringUtils.isEmpty(userId)) {
                     // 获取角色
-                    List<GrantedAuthority> authorities = new ArrayList<>();
+                    Set<Authority> authorities = new HashSet<>();
                     String authority = claims.get("authorities").toString();
                     if(!StringUtils.isEmpty(authority)){
                         List<String> authorityMap = JSONObject.parseObject(authority, List.class);

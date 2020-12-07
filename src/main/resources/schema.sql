@@ -24,8 +24,6 @@ CREATE TABLE `authority` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `user_authority` (
-  `create_time` datetime(6) DEFAULT NULL,
-  `update_time` datetime(6) DEFAULT NULL,
   `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `authority_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`user_id`,`authority_id`) USING BTREE,
