@@ -1,14 +1,14 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.103.154.174:3306/chat?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${CHAT_HOST:mysql}:3306/chat?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password: ${MYSQL_ROOT_PASSWORD:123456}
   jpa:
     show-sql: true
   data:
     mongodb:
-      uri: mongodb://chat:123456@47.103.154.174:27017,47.103.154.174:27017,47.103.154.174:27017/chat?replicaSet=mongos
+      uri: mongodb://chat:123456@${CHAT_HOST:mongodb1}:27017,${CHAT_HOST:mongodb2}:27017,${CHAT_HOST:mongodb3}:27017/chat?replicaSet=mongos
 
 
 logging.level.org .springframework.data.mongodb.core: DEBUG

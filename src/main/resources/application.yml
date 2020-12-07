@@ -7,21 +7,21 @@ spring:
   messages:
     basename: i18n.message
   profiles:
-    active: dev
+    active: ${chat-active:dev}
 server:
   port: 62519
 nettyserver:
   port: 62520
 
 chat:
-  appId: appId
-  appKey: appKey
-  masterSecret: masterSecret
+  appId: ${chat-appId}
+  appKey: ${chat-appKey}
+  masterSecret: ${chat-masterSecret}
   url: http://sdk.open.api.igexin.com/apiex.htm
 
 # JWT配置
 jwt:
-  signKey: 123456
+  signKey: ${CHAT_SIGN_KEY:123456}
   # HeaderKEY
   tokenHeader: Authorization
   # Token前缀字符
