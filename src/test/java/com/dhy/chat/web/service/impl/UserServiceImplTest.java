@@ -3,21 +3,17 @@ package com.dhy.chat.web.service.impl;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.web.repository.UserRepository;
 import com.dhy.chat.web.service.IUserService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
 public class UserServiceImplTest {
@@ -55,9 +51,9 @@ public class UserServiceImplTest {
         userIds.add(user3.getId());
         Set<String> ids =  userService.getUserClientIds(userIds);
 
-        Assert.assertNotNull(ids);
+        assertNotNull(ids);
         assertEquals(2, ids.size());
-        Assert.assertTrue(ids.contains(user1.getClientId()));
-        Assert.assertTrue(ids.contains(user2.getClientId()));
+        assertTrue(ids.contains(user1.getClientId()));
+        assertTrue(ids.contains(user2.getClientId()));
     }
 }
