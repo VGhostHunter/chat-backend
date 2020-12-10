@@ -1,4 +1,4 @@
-package com.dhy.chat.dto;
+package com.dhy.chat.dto.user;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

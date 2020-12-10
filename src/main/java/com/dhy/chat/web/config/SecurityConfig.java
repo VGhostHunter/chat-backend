@@ -152,13 +152,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests(req -> req.antMatchers("/api/user/create", "/api/user/login", "/favicon.ico").permitAll()
+        http.authorizeRequests(req -> req.antMatchers("/api/user/create", "/api/user/login", "/api/user/token").permitAll()
                     .antMatchers(HttpMethod.GET, "/swagger-ui.html",
                             "/swagger-ui/*",
                             "/swagger-resources/**",
                             "/v2/api-docs",
                             "/v3/api-docs",
-                            "/webjars/**").permitAll()
+                            "/webjars/**",
+                            "/favicon.ico").permitAll()
                     .antMatchers("/api/**").hasAuthority(ChatAppSeeder.GENERAL_USER)
                     .anyRequest().authenticated()
                 )
@@ -168,9 +169,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 基于Token不需要session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                // 添加审计过滤器
                 .addFilterBefore(auditFilter(), FilterSecurityInterceptor.class)
                 // 添加JWT过滤器
-                .addFilter(jwtAuthenticationTokenFilter)
+                .addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 // 禁用缓存
                 .headers(HeadersConfigurer::cacheControl)
                 //配置登出地址

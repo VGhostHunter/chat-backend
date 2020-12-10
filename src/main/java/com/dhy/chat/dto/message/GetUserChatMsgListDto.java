@@ -1,5 +1,6 @@
-package com.dhy.chat.dto;
+package com.dhy.chat.dto.message;
 
+import com.dhy.chat.dto.PageSortAndFilterDto;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotBlank;

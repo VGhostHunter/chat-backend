@@ -1,7 +1,9 @@
 package com.dhy.chat.web.service;
 
-import com.dhy.chat.dto.CreateUserDto;
-import com.dhy.chat.dto.UserDto;
+import com.dhy.chat.dto.user.AuthDto;
+import com.dhy.chat.dto.user.CreateUserDto;
+import com.dhy.chat.dto.user.LoginDto;
+import com.dhy.chat.dto.user.UserDto;
 
 import java.util.List;
 import java.util.Set;
@@ -45,4 +47,19 @@ public interface IUserService {
      * @return ClientIds
      */
     Set<String> getUserClientIds(List<String> userIds);
+
+    /**
+     * 用户登录
+     * @param input
+     * @return
+     */
+    AuthDto login(LoginDto input);
+
+    /**
+     * refreshToken
+     * @param token
+     * @param refreshToken
+     * @return
+     */
+    AuthDto refreshToken(String token, String refreshToken);
 }

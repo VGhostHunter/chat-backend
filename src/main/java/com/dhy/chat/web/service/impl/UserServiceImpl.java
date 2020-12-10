@@ -1,15 +1,22 @@
 package com.dhy.chat.web.service.impl;
 
 import com.dhy.chat.ChatAppSeeder;
-import com.dhy.chat.dto.CreateUserDto;
-import com.dhy.chat.dto.UserDto;
+import com.dhy.chat.dto.user.AuthDto;
+import com.dhy.chat.dto.user.CreateUserDto;
+import com.dhy.chat.dto.user.LoginDto;
+import com.dhy.chat.dto.user.UserDto;
 import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.exception.BusinessException;
+import com.dhy.chat.utils.JwtTokenUtil;
+import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
 import com.dhy.chat.web.service.IUserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -27,13 +34,19 @@ public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthorityRepository authorityRepository;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AppProperties appProperties;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
-                           AuthorityRepository authorityRepository) {
+                           AuthorityRepository authorityRepository,
+                           JwtTokenUtil jwtTokenUtil,
+                           AppProperties appProperties) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.appProperties = appProperties;
     }
 
     @Override
@@ -88,7 +101,25 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Set<String> getUserClientIds(List<String> userIds) {
-        Set<String> distinctClientIdByIdIn = userRepository.findDistinctClientIdByIdIn(userIds);
-        return distinctClientIdByIdIn;
+        return userRepository.findDistinctClientIdByIdIn(userIds);
+    }
+
+    @Override
+    public AuthDto login(LoginDto input) throws AuthenticationException {
+        return userRepository.findOptionalByUsername(input.getUsername())
+                .filter(user -> passwordEncoder.matches(input.getPassword(), user.getPassword()))
+                .map(user -> new AuthDto(jwtTokenUtil.createAccessToken(user), jwtTokenUtil.createRefreshToken(user)))
+                .orElseThrow(() -> new BadCredentialsException("用户名或密码错误"));
+    }
+
+    @Override
+    public AuthDto refreshToken(String token, String refreshToken) throws AccessDeniedException {
+        var jwtToken = token.replace(appProperties.getJwt().getTokenPrefix(), "");
+        if(jwtTokenUtil.validateRefreshToken(refreshToken)
+                &&jwtTokenUtil.validateWithoutExpiration(jwtToken)) {
+            return new AuthDto(jwtTokenUtil.buildAccessTokenWithRefreshToken(refreshToken), refreshToken);
+        }
+
+        throw new AccessDeniedException("访问被拒绝");
     }
 }

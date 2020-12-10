@@ -1,7 +1,7 @@
 package com.dhy.chat.web.service;
 
-import com.dhy.chat.dto.ChatMsgDto;
-import com.dhy.chat.dto.GetUserChatMsgListDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
+import com.dhy.chat.dto.message.GetUserChatMsgListDto;
 import com.dhy.chat.dto.PageResult;
 import com.dhy.chat.entity.ChatMsg;
 import org.springframework.security.core.AuthenticatedPrincipal;

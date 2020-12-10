@@ -1,4 +1,4 @@
-package com.dhy.chat.dto;
+package com.dhy.chat.dto.user;
 
 /**
  * @author vghosthunter

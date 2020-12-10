@@ -1,6 +1,6 @@
 package com.dhy.chat.web.service;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.gexin.rp.sdk.base.IPushResult;
 
 /**

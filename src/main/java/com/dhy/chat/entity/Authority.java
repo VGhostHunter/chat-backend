@@ -5,10 +5,18 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
+/**
+ * @author vghosthunter
+ */
 @Entity
 @Table(name = "authority")
 @GenericGenerator(name = "jpa-uuid", strategy = "uuid")
 public class Authority extends CreateAndUpdateAuditEntity implements GrantedAuthority {
+
+    public Authority(){};
+    public Authority(String authority){
+        this.authority = authority;
+    };
 
     private static final long serialVersionUID = 5496002851233236900L;
 

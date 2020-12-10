@@ -1,6 +1,6 @@
 package com.dhy.chat.web.repository;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

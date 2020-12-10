@@ -1,6 +1,6 @@
 package com.dhy.chat.web.service.impl;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.web.config.properties.ChatAppProperties;
 import com.dhy.chat.web.service.IPushService;
 import com.fasterxml.jackson.core.JsonProcessingException;

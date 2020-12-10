@@ -1,16 +1,15 @@
 package com.dhy.chat.web.controller;
 
-import com.dhy.chat.dto.CreateUserDto;
-import com.dhy.chat.dto.LoginDto;
+import com.dhy.chat.dto.user.AuthDto;
+import com.dhy.chat.dto.user.CreateUserDto;
+import com.dhy.chat.dto.user.LoginDto;
 import com.dhy.chat.dto.Result;
-import com.dhy.chat.dto.UserDto;
+import com.dhy.chat.dto.user.UserDto;
 import com.dhy.chat.web.service.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 /**
  * @author vghosthunter
@@ -56,10 +55,21 @@ public class UserController {
     }
 
     /**
-     * 只是为了生成api
+     * 获取token
      */
-    @PostMapping("/login")
+    @PostMapping("/token")
     @ApiOperation("User Login")
-    private void login(@Validated @RequestBody LoginDto input) {
+    private Result<AuthDto> token(@Validated @RequestBody LoginDto input) {
+        return Result.succeeded(userService.login(input));
+    }
+
+    /**
+     * refresh token
+     */
+    @PostMapping("/token/refresh")
+    @ApiOperation("refresh token ")
+    private Result<AuthDto> refresh(@RequestHeader(name = "Authorization") String token,
+                                    @RequestParam String refreshToken) {
+        return Result.succeeded(userService.refreshToken(token, refreshToken));
     }
 }

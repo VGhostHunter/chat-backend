@@ -1,17 +1,17 @@
 package com.dhy.chat.netty;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.enums.MsgActionEnum;
+import com.dhy.chat.utils.JwtTokenUtil;
 import com.dhy.chat.utils.SpringUtils;
-import com.dhy.chat.web.config.properties.JwtProperties;
+import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.service.IChatMsgService;
 import com.dhy.chat.web.service.IPushService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gexin.rp.sdk.base.IPushResult;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -34,12 +34,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
     private final IChatMsgService chatMsgService;
     private final IPushService pushService;
-    private final JwtProperties jwtProperties;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AppProperties appProperties;
 
     public ChatHandler() {
         chatMsgService = (IChatMsgService) SpringUtils.getBean("chatMsgService");
         pushService = (IPushService) SpringUtils.getBean("pushServiceImpl");
-        jwtProperties = (JwtProperties) SpringUtils.getBean("jwtProperties");
+        jwtTokenUtil = (JwtTokenUtil) SpringUtils.getBean("jwtTokenUtil");
+        appProperties = (AppProperties) SpringUtils.getBean("appProperties");
     }
 
     /**
@@ -135,12 +137,10 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     private void connect(Channel currentChannel, DataContent dataContent) {
         //认证
         // 截取JWT前缀
-        String token = dataContent.getToken().replace(jwtProperties.getTokenPrefix(), "");
+        String token = dataContent.getToken().replace(appProperties.getJwt().getTokenPrefix(), "");
         // 解析JWT
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtProperties.getSignKey())
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = jwtTokenUtil.parseClaims(token, jwtTokenUtil.getKey())
+                .orElseThrow();
         // 获取用户名
         String userId = claims.getId();
         //当websocket 第一次open的时候，初始化channel，把用的channel和userId关联起来

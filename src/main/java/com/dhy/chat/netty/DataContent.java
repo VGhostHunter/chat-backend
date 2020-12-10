@@ -1,6 +1,6 @@
 package com.dhy.chat.netty;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.enums.MsgActionEnum;
 
 import java.io.Serializable;

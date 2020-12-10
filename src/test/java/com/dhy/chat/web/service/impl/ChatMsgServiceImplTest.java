@@ -1,6 +1,6 @@
 package com.dhy.chat.web.service.impl;
 
-import com.dhy.chat.dto.ChatMsgDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.enums.MsgType;
 import org.junit.jupiter.api.Test;

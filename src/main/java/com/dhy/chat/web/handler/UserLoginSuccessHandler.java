@@ -3,6 +3,7 @@ package com.dhy.chat.web.handler;
 import com.dhy.chat.entity.AuditLog;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.utils.JwtTokenUtil;
+import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.config.properties.JwtProperties;
 import com.dhy.chat.web.repository.AuditLogRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,16 +25,16 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final JwtTokenUtil jwtTokenUtil;
-    private final JwtProperties jwtProperties;
+    private final AppProperties appProperties;
     private final AuditLogRepository auditLogRepository;
 
     public UserLoginSuccessHandler(ObjectMapper objectMapper,
                                    JwtTokenUtil jwtTokenUtil,
-                                   JwtProperties jwtProperties,
+                                   AppProperties appProperties,
                                    AuditLogRepository auditLogRepository) {
         this.objectMapper = objectMapper;
         this.jwtTokenUtil = jwtTokenUtil;
-        this.jwtProperties = jwtProperties;
+        this.appProperties = appProperties;
         this.auditLogRepository = auditLogRepository;
     }
 
@@ -51,7 +52,6 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         // 组装JWT
         User user =  (User) authentication.getPrincipal();
         String token = jwtTokenUtil.createAccessToken(user);
-        token = jwtProperties.getTokenPrefix() + token;
 
         // 封装返回参数
         Map<String,Object> resultData = new HashMap<>();
