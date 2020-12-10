@@ -3,8 +3,6 @@ package com.dhy.chat.exception;
 import com.dhy.chat.dto.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -19,26 +17,20 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 public class RunTimeExceptionHandler {
 
-    private final MessageSource messageSource;
-
     private Logger log = LoggerFactory.getLogger(getClass());
-
-    public RunTimeExceptionHandler(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result exceptionHandler(Exception e){
         e.printStackTrace();
-        return Result.failure();
+        return Result.failure(e.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result exceptionHandler(BusinessException e){
         e.printStackTrace();
-        return Result.failure(messageSource.getMessage(e.getMessage(), null, e.getMessage(), LocaleContextHolder.getLocale()));
+        return Result.failure(e.getMessage());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

@@ -9,10 +9,12 @@ import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.exception.BusinessException;
 import com.dhy.chat.utils.JwtTokenUtil;
+import com.dhy.chat.utils.LocalMessageUtil;
 import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
 import com.dhy.chat.web.service.IUserService;
+import org.aspectj.bridge.MessageUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -36,17 +38,20 @@ public class UserServiceImpl implements IUserService {
     private final AuthorityRepository authorityRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final AppProperties appProperties;
+    private final LocalMessageUtil messageUtil;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            AuthorityRepository authorityRepository,
                            JwtTokenUtil jwtTokenUtil,
-                           AppProperties appProperties) {
+                           AppProperties appProperties,
+                           LocalMessageUtil messageUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.appProperties = appProperties;
+        this.messageUtil = messageUtil;
     }
 
     @Override
@@ -66,7 +71,7 @@ public class UserServiceImpl implements IUserService {
     public UserDto createUser(CreateUserDto createUserDto) {
         User isExist = userRepository.findByUsername(createUserDto.getUsername());
         if(isExist != null) {
-            throw new BusinessException("message.usernameAlreadyExists");
+            throw new BusinessException(messageUtil.GetMsg("message.usernameAlreadyExists"));
         }
         User user = new User();
         BeanUtils.copyProperties(createUserDto, user);
@@ -109,7 +114,7 @@ public class UserServiceImpl implements IUserService {
         return userRepository.findOptionalByUsername(input.getUsername())
                 .filter(user -> passwordEncoder.matches(input.getPassword(), user.getPassword()))
                 .map(user -> new AuthDto(jwtTokenUtil.createAccessToken(user), jwtTokenUtil.createRefreshToken(user)))
-                .orElseThrow(() -> new BadCredentialsException("用户名或密码错误"));
+                .orElseThrow(() -> new BadCredentialsException(messageUtil.GetMsg("message.usernameAlreadyExists")));
     }
 
     @Override
@@ -120,6 +125,6 @@ public class UserServiceImpl implements IUserService {
             return new AuthDto(jwtTokenUtil.buildAccessTokenWithRefreshToken(refreshToken), refreshToken);
         }
 
-        throw new AccessDeniedException("访问被拒绝");
+        throw new AccessDeniedException(messageUtil.GetMsg("message.accessDenied"));
     }
 }

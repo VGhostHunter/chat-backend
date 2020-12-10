@@ -1,6 +1,7 @@
 package com.dhy.chat.web.handler;
 
 import com.dhy.chat.dto.Result;
+import com.dhy.chat.utils.LocalMessageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +26,12 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
     private Logger log = LoggerFactory.getLogger(getClass());
 
     private final ObjectMapper objectMapper;
+    private final LocalMessageUtil localMessageUtil;
 
-    public UserLoginFailureHandler(ObjectMapper objectMapper) {
+    public UserLoginFailureHandler(ObjectMapper objectMapper,
+                                   LocalMessageUtil localMessageUtil) {
         this.objectMapper = objectMapper;
+        this.localMessageUtil = localMessageUtil;
     }
 
     /**
@@ -41,19 +45,19 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
         if (exception instanceof UsernameNotFoundException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.NOT_FOUND.value());
-            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.NOT_FOUND, "用户名不存在")));
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.NOT_FOUND, localMessageUtil.GetMsg("message.usernameNotExist"))));
 
         } else if (exception instanceof LockedException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户被冻结")));
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, localMessageUtil.GetMsg("message.userIsFrozen"))));
         } else if (exception instanceof BadCredentialsException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.BAD_REQUEST.value());
-            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "用户名密码不正确")));
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, localMessageUtil.GetMsg("message.usernameOrPasswordError"))));
         } else {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, "登录失败")));
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, localMessageUtil.GetMsg("message.loginFailed"))));
         }
     }
 }

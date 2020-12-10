@@ -10,6 +10,9 @@ services:
       - "62520:62520"
     env_file:
       - '.env'
+    environment:
+      JWT_KEY: ${JWT_KEY}
+      JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
     container_name: chat-backend
     networks:
       - chat-backend
