@@ -21,12 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final IUserService userService;
-
-    private final IEmailService emailService;
-
-    public UserController(IUserService userService, IEmailService emailService) {
+    
+    public UserController(IUserService userService) {
         this.userService = userService;
-        this.emailService = emailService;
     }
 
 
@@ -75,11 +72,5 @@ public class UserController {
     private Result<AuthDto> refresh(@RequestHeader(name = "Authorization") String token,
                                     @RequestParam String refreshToken) {
         return Result.succeeded(userService.refreshToken(token, refreshToken));
-    }
-
-    @RequestMapping
-    public String test() {
-        emailService.send("", "");
-        return "ok";
     }
 }
