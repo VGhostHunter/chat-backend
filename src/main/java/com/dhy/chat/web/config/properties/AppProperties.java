@@ -12,11 +12,41 @@ public class AppProperties {
 
     private JwtProperties jwt = new JwtProperties();
 
+    private AliSmsProperties aliSmsProperties = new AliSmsProperties();
+
+    private ProviderProperties provider = new ProviderProperties();
+
+    private LeanCloudProperties leanCloud = new LeanCloudProperties();
+
     public JwtProperties getJwt() {
         return jwt;
     }
 
     public void setJwt(JwtProperties jwt) {
         this.jwt = jwt;
+    }
+
+    public ProviderProperties getProvider() {
+        return provider;
+    }
+
+    public void setProvider(ProviderProperties provider) {
+        this.provider = provider;
+    }
+
+    public AliSmsProperties getAliSmsProperties() {
+        return aliSmsProperties;
+    }
+
+    public void setAliSmsProperties(AliSmsProperties aliSmsProperties) {
+        this.aliSmsProperties = aliSmsProperties;
+    }
+
+    public LeanCloudProperties getLeanCloud() {
+        return leanCloud;
+    }
+
+    public void setLeanCloud(LeanCloudProperties leanCloud) {
+        this.leanCloud = leanCloud;
     }
 }

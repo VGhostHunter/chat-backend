@@ -2,7 +2,7 @@ package com.dhy.chat.web.service.impl;
 
 import com.dhy.chat.entity.User;
 import com.dhy.chat.web.repository.UserRepository;
-import com.dhy.chat.web.service.IUserService;
+import com.dhy.chat.web.service.user.IUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

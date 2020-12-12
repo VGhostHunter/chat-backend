@@ -1,4 +1,4 @@
-package com.dhy.chat.web.service.impl;
+package com.dhy.chat.web.service.user.impl;
 
 import com.dhy.chat.ChatAppSeeder;
 import com.dhy.chat.dto.user.AuthDto;
@@ -13,8 +13,7 @@ import com.dhy.chat.utils.LocalMessageUtil;
 import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
-import com.dhy.chat.web.service.IUserService;
-import org.aspectj.bridge.MessageUtil;
+import com.dhy.chat.web.service.user.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;

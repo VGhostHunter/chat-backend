@@ -3,12 +3,16 @@ package com.dhy.chat.utils;
 import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.web.config.properties.AppProperties;
+import com.dhy.chat.web.config.properties.JwtProperties;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Base64;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,12 @@ public class JwtTokenUtilTest {
     @BeforeEach
     public void setup() {
         appProperties = new AppProperties();
+        JwtProperties jwt = new JwtProperties();
+        var key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        var refreshKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        jwt.setKey(Base64.getEncoder().encodeToString(key.getEncoded()));
+        jwt.setRefreshKey(Base64.getEncoder().encodeToString(refreshKey.getEncoded()));
+        appProperties.setJwt(jwt);
         jwtTokenUtil = new JwtTokenUtil(appProperties);
     }
 

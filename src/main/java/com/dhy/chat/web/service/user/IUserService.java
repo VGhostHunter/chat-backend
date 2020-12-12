@@ -1,4 +1,4 @@
-package com.dhy.chat.web.service;
+package com.dhy.chat.web.service.user;
 
 import com.dhy.chat.dto.user.AuthDto;
 import com.dhy.chat.dto.user.CreateUserDto;

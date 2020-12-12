@@ -3,6 +3,7 @@ package com.dhy.chat.web.service.impl;
 import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.enums.MsgType;
+import com.dhy.chat.web.service.msg.impl.ChatMsgServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

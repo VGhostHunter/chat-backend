@@ -8,6 +8,17 @@ spring:
     basename: i18n.message
   profiles:
     active: ${chat-active:dev}
+#  mail:
+#    host: ${SMTP_HOST}
+#    password: ${SMTP_PASSWORD}
+#    port: ${SMTP_PORT}
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#    username: ${SMTP_USERNAME}
 server:
   port: 62519
 nettyserver:
@@ -30,3 +41,14 @@ app:
     tokenPrefix: Chat-
     accessTokenExpireTime: 3600000
     refreshTokenExpireTime: 2592000000
+  ali-sms-properties:
+    api-key: ${ALI_AIP_KEY}
+    api-secret: ${ALI_AIP_SECRET}
+  leanCloud:
+    app-id: ${LEANCLOUD_APP_ID}}
+    app-key: ${LEANCLOUD_APP_KEY}}
+  provider:
+    sms-provider:
+      name: ali
+    email-provider:
+      name: api

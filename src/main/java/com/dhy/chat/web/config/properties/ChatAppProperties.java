@@ -3,6 +3,9 @@ package com.dhy.chat.web.config.properties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author vghosthunter
+ */
 @Configuration
 @ConfigurationProperties(prefix = "chat")
 public class ChatAppProperties {

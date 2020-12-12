@@ -1,8 +1,8 @@
-package com.dhy.chat.web.service.impl;
+package com.dhy.chat.web.service.msg.impl;
 
 import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.web.config.properties.ChatAppProperties;
-import com.dhy.chat.web.service.IPushService;
+import com.dhy.chat.web.service.msg.IPushService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gexin.rp.sdk.base.IPushResult;

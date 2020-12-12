@@ -5,7 +5,8 @@ import com.dhy.chat.dto.user.CreateUserDto;
 import com.dhy.chat.dto.user.LoginDto;
 import com.dhy.chat.dto.Result;
 import com.dhy.chat.dto.user.UserDto;
-import com.dhy.chat.web.service.IUserService;
+import com.dhy.chat.web.service.email.IEmailService;
+import com.dhy.chat.web.service.user.IUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +22,11 @@ public class UserController {
 
     private final IUserService userService;
 
-    public UserController(IUserService userService) {
+    private final IEmailService emailService;
+
+    public UserController(IUserService userService, IEmailService emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
 
 
@@ -71,5 +75,11 @@ public class UserController {
     private Result<AuthDto> refresh(@RequestHeader(name = "Authorization") String token,
                                     @RequestParam String refreshToken) {
         return Result.succeeded(userService.refreshToken(token, refreshToken));
+    }
+
+    @RequestMapping
+    public String test() {
+        emailService.send("", "");
+        return "ok";
     }
 }

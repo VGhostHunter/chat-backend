@@ -7,7 +7,7 @@ import com.dhy.chat.web.filter.JwtAuthenticationTokenFilter;
 import com.dhy.chat.web.filter.RestAuthenticationFilter;
 import com.dhy.chat.web.handler.*;
 import com.dhy.chat.web.repository.AuditLogRepository;
-import com.dhy.chat.web.service.impl.UserDetailServiceImpl;
+import com.dhy.chat.web.service.user.impl.UserDetailServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
@@ -25,7 +25,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;

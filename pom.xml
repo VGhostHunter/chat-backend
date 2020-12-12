@@ -17,6 +17,12 @@
     <properties>
         <java.version>11</java.version>
         <jjwt.version>0.11.2</jjwt.version>
+        <redisson.version>3.12.5</redisson.version>
+        <otp.version>0.2.0</otp.version>
+        <embedded.redis.version>0.7.2</embedded.redis.version>
+        <aliyun.version>4.5.0</aliyun.version>
+        <leancloud.version>6.5.3</leancloud.version>
+        <sendgrid.version>4.0.1</sendgrid.version>
     </properties>
 
     <dependencies>
@@ -45,6 +51,40 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- Java OTP 依赖 -->
+        <dependency>
+            <groupId>com.eatthepath</groupId>
+            <artifactId>java-otp</artifactId>
+            <version>${otp.version}</version>
+        </dependency>
+
+        <!-- SendGrid 依赖 -->
+        <dependency>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>${sendgrid.version}</version>
+        </dependency>
+
+        <!-- Spring Email -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
+<!--        &lt;!&ndash; Redisson 依赖 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.redisson</groupId>-->
+<!--            <artifactId>redisson-spring-boot-starter</artifactId>-->
+<!--            <version>${redisson.version}</version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash; 嵌入式 Redis 依赖，集成测试时需要 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>it.ozimov</groupId>-->
+<!--            <artifactId>embedded-redis</artifactId>-->
+<!--            <version>${embedded.redis.version}</version>-->
+<!--        </dependency>-->
+
         <!-- JWT依赖 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -60,6 +100,25 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
+        </dependency>
+
+        <!-- 阿里云依赖 -->
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>aliyun-java-sdk-core</artifactId>
+            <version>${aliyun.version}</version>
+        </dependency>
+
+        <!-- LeanCloud 依赖 -->
+        <dependency>
+            <groupId>cn.leancloud</groupId>
+            <artifactId>storage-core</artifactId>
+            <version>${leancloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.leancloud</groupId>
+            <artifactId>realtime-core</artifactId>
+            <version>${leancloud.version}</version>
         </dependency>
 
         <dependency>
