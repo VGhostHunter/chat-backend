@@ -123,7 +123,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new AuditorAware<String>() {
             @Override
             public Optional<String> getCurrentAuditor() {
-                if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
+                if(SecurityContextHolder.getContext().getAuthentication() != null &&
+                        SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof User) {
                     var userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
                     return Optional.ofNullable(userId);
                 }

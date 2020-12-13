@@ -5,11 +5,11 @@ import com.dhy.chat.dto.user.AuthDto;
 import com.dhy.chat.dto.user.CreateUserDto;
 import com.dhy.chat.dto.user.LoginDto;
 import com.dhy.chat.dto.user.UserDto;
-import com.dhy.chat.entity.Authority;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.exception.BusinessException;
 import com.dhy.chat.utils.JwtTokenUtil;
 import com.dhy.chat.utils.LocalMessageUtil;
+import com.dhy.chat.utils.TotpUtil;
 import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
@@ -38,19 +38,22 @@ public class UserServiceImpl implements IUserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AppProperties appProperties;
     private final LocalMessageUtil messageUtil;
+    private final TotpUtil totpUtil;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
                            AuthorityRepository authorityRepository,
                            JwtTokenUtil jwtTokenUtil,
                            AppProperties appProperties,
-                           LocalMessageUtil messageUtil) {
+                           LocalMessageUtil messageUtil,
+                           TotpUtil totpUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.jwtTokenUtil = jwtTokenUtil;
         this.appProperties = appProperties;
         this.messageUtil = messageUtil;
+        this.totpUtil = totpUtil;
     }
 
     @Override
@@ -60,9 +63,33 @@ public class UserServiceImpl implements IUserService {
         if(user == null) {
             return null;
         }
+
+        checkUser(user);
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
         return userDto;
+    }
+
+    private void checkUser(User user) {
+        if (!user.isEnabled()) {
+            throw new BusinessException(messageUtil.GetMsg("message.userIsNotEnable"));
+        }
+        if (!user.isAccountNonLocked()) {
+            throw new BusinessException(messageUtil.GetMsg("message.userIsLocked"));
+        }
+        if (!user.isAccountNonExpired()) {
+            throw new BusinessException(messageUtil.GetMsg("message.userAccountIsExpired"));
+        }
+    }
+
+    @Override
+    public Optional<User> getOptionalByUsernameAndPassword(LoginDto input) {
+        return userRepository.findOptionalByUsername(input.getUsername())
+                .filter(user -> passwordEncoder.matches(input.getPassword(), user.getPassword()))
+                .map(user -> {
+                    checkUser(user);
+                    return user;
+                });
     }
 
     @Override
@@ -72,18 +99,19 @@ public class UserServiceImpl implements IUserService {
         if(isExist != null) {
             throw new BusinessException(messageUtil.GetMsg("message.usernameAlreadyExists"));
         }
-        User user = new User();
-        BeanUtils.copyProperties(createUserDto, user);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Set<Authority> defaultRole = new HashSet<>();
-        Authority auth = authorityRepository.findByAuthority(ChatAppSeeder.GENERAL_USER);
-        defaultRole.add(auth);
-        user.setAuthorities(defaultRole);
-        userRepository.save(user);
 
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        return userDto;
+        return authorityRepository.findOptionalByAuthority(ChatAppSeeder.GENERAL_USER)
+                .map(role -> {
+                    User user = new User();
+                    BeanUtils.copyProperties(createUserDto, user);
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
+                    user.setAuthorities(Set.of(role));
+                    user.setMfaKey(totpUtil.generateStringKey());
+                    userRepository.save(user);
+                    UserDto userDto = new UserDto();
+                    BeanUtils.copyProperties(user, userDto);
+                    return userDto;
+                }).orElseThrow();
     }
 
     @Override

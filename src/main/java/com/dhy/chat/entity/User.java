@@ -32,7 +32,15 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     private String password;
 
+    private String email;
+
     private String picture;
+
+    @Column(nullable = false)
+    private boolean usingMfa = false;
+
+    @Column(nullable = false)
+    private String mfaKey;
 
     private String clientId;
 
@@ -129,6 +137,30 @@ public class User extends CreateAndUpdateAuditEntity implements UserDetails {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isUsingMfa() {
+        return usingMfa;
+    }
+
+    public void setUsingMfa(boolean usingMfa) {
+        this.usingMfa = usingMfa;
+    }
+
+    public String getMfaKey() {
+        return mfaKey;
+    }
+
+    public void setMfaKey(String mfaKey) {
+        this.mfaKey = mfaKey;
     }
 
     public Boolean getExpired() {

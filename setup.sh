@@ -10,7 +10,7 @@ rs.initiate({
 });
 use admin
 db.createUser({user: 'root', pwd: '123456', roles: [{role: 'userAdminAnyDatabase', db: 'admin'}]});
-use realtime
+use chat
 db.createUser({user: 'chat', pwd: '123456', roles:[{role:'readWrite',db:'chat'}]})
 EOF
 echo "************Mongo users created************"

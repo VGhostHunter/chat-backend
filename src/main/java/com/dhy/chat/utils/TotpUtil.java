@@ -83,7 +83,7 @@ public class TotpUtil {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
-    public String encodeKeyToString() {
+    public String generateStringKey() {
         return encodeKeyToString(generateKey());
     }
 

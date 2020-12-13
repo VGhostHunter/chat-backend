@@ -4,8 +4,10 @@ import com.dhy.chat.dto.user.AuthDto;
 import com.dhy.chat.dto.user.CreateUserDto;
 import com.dhy.chat.dto.user.LoginDto;
 import com.dhy.chat.dto.user.UserDto;
+import com.dhy.chat.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -19,6 +21,13 @@ public interface IUserService {
      * @return UserDto
      */
     UserDto getUserByUsername(String username);
+
+    /**
+     * getOptionalByUsernameAndPassword
+     * @param input input
+     * @return Optional<UserDto>
+     */
+    Optional<User> getOptionalByUsernameAndPassword(LoginDto input);
 
     /**
      * createUser

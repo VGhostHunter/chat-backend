@@ -46,6 +46,24 @@ services:
       restart_policy:
         condition: on-failure
 
+  redis:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - chat-backend
+    container_name: redis
+    volumes:
+      - "/data/redis/data:/data"
+      - "/data/redis/redis.conf:/etc/redis/redis.conf"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
+
   mysql:
     image: 'mysql:8.0.22'
     volumes:

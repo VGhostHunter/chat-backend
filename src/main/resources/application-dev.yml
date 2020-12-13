@@ -9,6 +9,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://chat:123456@${CHAT_HOST:mongodb1}:27017,${CHAT_HOST:mongodb2}:27017,${CHAT_HOST:mongodb3}:27017/chat?replicaSet=mongos
+  redis:
+    host: ${REDIS_HOST:redis}
+    port: 6379
+    password: ${REDIS_PASSWORD:111111}
+    database: 0
 
 
 logging.level.org .springframework.data.mongodb.core: DEBUG

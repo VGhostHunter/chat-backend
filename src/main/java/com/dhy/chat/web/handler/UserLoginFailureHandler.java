@@ -50,7 +50,7 @@ public class UserLoginFailureHandler implements AuthenticationFailureHandler {
         } else if (exception instanceof LockedException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, localMessageUtil.GetMsg("message.userIsFrozen"))));
+            response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.INTERNAL_SERVER_ERROR, localMessageUtil.GetMsg("message.userIsLocked"))));
         } else if (exception instanceof BadCredentialsException){
             log.info("【登录失败】"+exception.getMessage());
             response.setStatus(HttpStatus.BAD_REQUEST.value());
