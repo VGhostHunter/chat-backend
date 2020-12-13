@@ -5,6 +5,7 @@ import com.sendgrid.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,14 +19,17 @@ public class ApiEmailService implements IEmailService {
 
     private final SendGrid sendGrid;
     private final Logger log = LoggerFactory.getLogger(getClass());
+    private final MailProperties mailProperties;
 
-    public ApiEmailService(SendGrid sendGrid) {
+    public ApiEmailService(SendGrid sendGrid,
+                           MailProperties mailProperties) {
         this.sendGrid = sendGrid;
+        this.mailProperties = mailProperties;
     }
 
     @Override
     public void send(String email, String msg) {
-        var from = new Email("admin@chat.com");
+        var from = new Email(mailProperties.getUsername());
         var subject = "chat app 登录验证码";
         var to = new Email(email);
         var content = new Content("text/plain", "验证码为:" + msg);

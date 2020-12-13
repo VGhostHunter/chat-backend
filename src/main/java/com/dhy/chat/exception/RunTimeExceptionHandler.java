@@ -33,6 +33,13 @@ public class RunTimeExceptionHandler {
         return Result.failure(e.getMessage());
     }
 
+    @ExceptionHandler(ArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(ArgumentException e){
+        e.printStackTrace();
+        return Result.failure(e.getMessage());
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Result exceptionHandler(EntityNotFoundException e){

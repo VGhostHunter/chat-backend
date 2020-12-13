@@ -2,6 +2,7 @@ package com.dhy.chat.dto.user;
 
 import io.swagger.annotations.ApiModel;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,6 +27,8 @@ public class CreateUserDto {
 
     private String picture;
 
+    @NotBlank
+    @Email
     private String email;
 
     public String getUsername() {

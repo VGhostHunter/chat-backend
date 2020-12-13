@@ -1,11 +1,10 @@
 package com.dhy.chat.web.service.user.impl;
 
 import com.dhy.chat.ChatAppSeeder;
-import com.dhy.chat.dto.user.AuthDto;
-import com.dhy.chat.dto.user.CreateUserDto;
-import com.dhy.chat.dto.user.LoginDto;
-import com.dhy.chat.dto.user.UserDto;
+import com.dhy.chat.dto.user.*;
 import com.dhy.chat.entity.User;
+import com.dhy.chat.enums.MfaType;
+import com.dhy.chat.exception.ArgumentException;
 import com.dhy.chat.exception.BusinessException;
 import com.dhy.chat.utils.JwtTokenUtil;
 import com.dhy.chat.utils.LocalMessageUtil;
@@ -13,8 +12,11 @@ import com.dhy.chat.utils.TotpUtil;
 import com.dhy.chat.web.config.properties.AppProperties;
 import com.dhy.chat.web.repository.AuthorityRepository;
 import com.dhy.chat.web.repository.UserRepository;
+import com.dhy.chat.web.service.email.IEmailService;
+import com.dhy.chat.web.service.sms.ISmsService;
 import com.dhy.chat.web.service.user.IUserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.util.Pair;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
@@ -39,6 +41,9 @@ public class UserServiceImpl implements IUserService {
     private final AppProperties appProperties;
     private final LocalMessageUtil messageUtil;
     private final TotpUtil totpUtil;
+    private final IUserCacheService userCacheService;
+    private final ISmsService smsService;
+    private final IEmailService emailService;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
@@ -46,7 +51,10 @@ public class UserServiceImpl implements IUserService {
                            JwtTokenUtil jwtTokenUtil,
                            AppProperties appProperties,
                            LocalMessageUtil messageUtil,
-                           TotpUtil totpUtil) {
+                           TotpUtil totpUtil,
+                           IUserCacheService userCacheService,
+                           ISmsService smsService,
+                           IEmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
@@ -54,6 +62,9 @@ public class UserServiceImpl implements IUserService {
         this.appProperties = appProperties;
         this.messageUtil = messageUtil;
         this.totpUtil = totpUtil;
+        this.userCacheService = userCacheService;
+        this.smsService = smsService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -97,7 +108,7 @@ public class UserServiceImpl implements IUserService {
     public UserDto createUser(CreateUserDto createUserDto) {
         User isExist = userRepository.findByUsername(createUserDto.getUsername());
         if(isExist != null) {
-            throw new BusinessException(messageUtil.GetMsg("message.usernameAlreadyExists"));
+            throw new ArgumentException(messageUtil.GetMsg("message.usernameAlreadyExists"));
         }
 
         return authorityRepository.findOptionalByAuthority(ChatAppSeeder.GENERAL_USER)
@@ -140,8 +151,8 @@ public class UserServiceImpl implements IUserService {
     public AuthDto login(LoginDto input) throws AuthenticationException {
         return userRepository.findOptionalByUsername(input.getUsername())
                 .filter(user -> passwordEncoder.matches(input.getPassword(), user.getPassword()))
-                .map(user -> new AuthDto(jwtTokenUtil.createAccessToken(user), jwtTokenUtil.createRefreshToken(user)))
-                .orElseThrow(() -> new BadCredentialsException(messageUtil.GetMsg("message.usernameAlreadyExists")));
+                .map(this::login)
+                .orElseThrow(() -> new BadCredentialsException(messageUtil.GetMsg("message.usernameOrPasswordError")));
     }
 
     @Override
@@ -153,5 +164,33 @@ public class UserServiceImpl implements IUserService {
         }
 
         throw new AccessDeniedException(messageUtil.GetMsg("message.accessDenied"));
+    }
+
+    @Override
+    public void sendTotp(SendTotpDto sendTotpDto) {
+        userCacheService.retrieveUser(sendTotpDto.getMfaId())
+                .flatMap(user -> totpUtil.createTotp(user.getMfaKey()).map(code -> Pair.of(user, code)))
+                .ifPresentOrElse(pair -> {
+                    if (sendTotpDto.getMfaType() == MfaType.SMS) {
+                        smsService.send(pair.getFirst().getMobile(), pair.getSecond());
+                    } else if(sendTotpDto.getMfaType() == MfaType.EMAIL){
+                        emailService.send(pair.getFirst().getEmail(), pair.getSecond());
+                    } else {
+                        throw new ArgumentException(messageUtil.GetMsg("message.mfaTypeNotSupport"));
+                    }
+                }, () -> {
+                    throw new BusinessException(messageUtil.GetMsg("message.invalidMfaId"));
+                });
+    }
+
+    @Override
+    public AuthDto loginWithTotp(TotpVerificationDto input) {
+        return userCacheService.verifyTotp(input.getMfaId(), input.getCode())
+                .map(this::login)
+                .orElseThrow(() -> new BadCredentialsException("message.verifyCodeWrong"));
+    }
+
+    private AuthDto login(User user) {
+        return new AuthDto(jwtTokenUtil.createAccessToken(user), jwtTokenUtil.createRefreshToken(user));
     }
 }

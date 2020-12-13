@@ -8,17 +8,19 @@ spring:
     basename: i18n.message
   profiles:
     active: ${chat-active:dev}
-#  mail:
-#    host: ${SMTP_HOST}
-#    password: ${SMTP_PASSWORD}
-#    port: ${SMTP_PORT}
-#    properties:
-#      mail:
-#        smtp:
-#          auth: true
-#          starttls:
-#            enable: true
-#    username: ${SMTP_USERNAME}
+  mail:
+    host: ${SMTP_HOST}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    port: ${SMTP_PORT}
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          auth: true
+          starttls:
+            enable: true
 server:
   port: 62519
 nettyserver:
@@ -51,4 +53,4 @@ app:
     sms-provider:
       name: ali
     email-provider:
-      name: api
+      name: smtp

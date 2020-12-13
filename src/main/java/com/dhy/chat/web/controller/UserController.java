@@ -1,10 +1,7 @@
 package com.dhy.chat.web.controller;
 
-import com.dhy.chat.dto.user.AuthDto;
-import com.dhy.chat.dto.user.CreateUserDto;
-import com.dhy.chat.dto.user.LoginDto;
+import com.dhy.chat.dto.user.*;
 import com.dhy.chat.dto.Result;
-import com.dhy.chat.dto.user.UserDto;
 import com.dhy.chat.utils.LocalMessageUtil;
 import com.dhy.chat.web.service.user.IUserService;
 import com.dhy.chat.web.service.user.impl.IUserCacheService;
@@ -15,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * @author vghosthunter
@@ -84,6 +83,16 @@ public class UserController {
                         return ResponseEntity.ok().body(userService.login(input));
                     }
                 }).orElseThrow(() -> new BadCredentialsException(messageUtil.GetMsg("message.usernameOrPasswordError")));
+    }
+
+    @PostMapping("/totp")
+    public void sendTotp(@Valid @RequestBody SendTotpDto sendTotpDto) {
+        userService.sendTotp(sendTotpDto);
+    }
+
+    @PostMapping("/verify")
+    public Result<AuthDto> verifyTotp(@Valid @RequestBody TotpVerificationDto input) {
+        return Result.succeeded(userService.loginWithTotp(input));
     }
 
     /**

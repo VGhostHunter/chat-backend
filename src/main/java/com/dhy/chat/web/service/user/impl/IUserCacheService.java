@@ -17,6 +17,13 @@ public interface IUserCacheService {
     String cacheUser(User user);
 
     /**
+     * retrieveUser
+     * @param mfaId
+     * @return
+     */
+    Optional<User> retrieveUser(String mfaId);
+
+    /**
      * verifyTotp
      * @param mfaId
      * @param code

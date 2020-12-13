@@ -1,9 +1,6 @@
 package com.dhy.chat.web.service.user;
 
-import com.dhy.chat.dto.user.AuthDto;
-import com.dhy.chat.dto.user.CreateUserDto;
-import com.dhy.chat.dto.user.LoginDto;
-import com.dhy.chat.dto.user.UserDto;
+import com.dhy.chat.dto.user.*;
 import com.dhy.chat.entity.User;
 
 import java.util.List;
@@ -71,4 +68,17 @@ public interface IUserService {
      * @return
      */
     AuthDto refreshToken(String token, String refreshToken);
+
+    /**
+     * sendTotp
+     * @param sendTotpDto
+     */
+    void sendTotp(SendTotpDto sendTotpDto);
+
+    /**
+     * loginWithTotp
+     * @param input
+     * @return
+     */
+    AuthDto loginWithTotp(TotpVerificationDto input);
 }

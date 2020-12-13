@@ -43,6 +43,7 @@ public class UserCacheServiceImpl implements IUserCacheService {
         return mfaId;
     }
 
+    @Override
     public Optional<User> retrieveUser(String mfaId) {
         log.debug("输入参数 mfaId: {}", mfaId);
         RMapCache<String, User> cache = redisson.getMapCache(CACHE_MFA);
