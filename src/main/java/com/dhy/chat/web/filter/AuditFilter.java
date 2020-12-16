@@ -28,20 +28,24 @@ public class AuditFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setMethod(request.getMethod());
-        auditLog.setPath(request.getRequestURI());
-        auditLog.setIpAddress(request.getHeader("X-Real-IP"));
-        auditLogRepository.save(auditLog);
+        if(request.getRequestURI().contains("swagger")) {
+            filterChain.doFilter(request, response);
+        } else {
+            AuditLog auditLog = new AuditLog();
+            auditLog.setMethod(request.getMethod());
+            auditLog.setPath(request.getRequestURI());
+            auditLog.setIpAddress(request.getHeader("X-Real-IP"));
+            auditLogRepository.save(auditLog);
 
-        request.setAttribute("auditLogId", auditLog.getId());
+            request.setAttribute("auditLogId", auditLog.getId());
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
 
-        String id = (String) request.getAttribute("auditLogId");
-        AuditLog a = auditLogRepository.findById(id).get();
-        a.setStatus(response.getStatus());
+            String id = (String) request.getAttribute("auditLogId");
+            AuditLog a = auditLogRepository.findById(id).get();
+            a.setStatus(response.getStatus());
 
-        auditLogRepository.save(a);
+            auditLogRepository.save(a);
+        }
     }
 }
