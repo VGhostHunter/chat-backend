@@ -9,6 +9,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,10 +42,11 @@ public class FileController {
 
     @ApiOperation("头像上传")
     @PostMapping(value = "/profilePicture")
-    public Result<FileDto> upload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
         try {
             var bucket = BucketExistsArgs.builder().bucket(MinioProperties.profilePicture).build();
             boolean isExist = minioClient.bucketExists(bucket);
+            int o = 0/0;
             if (! isExist) {
                 //创建存储桶并设置只读权限
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(MinioProperties.profilePicture).region("aws-cn").build());
@@ -65,10 +68,10 @@ public class FileController {
 
             fileDto.setId(objectName);
             fileDto.setUrl(appProperties.getMinio().getEndPoint(), MinioProperties.profilePicture, objectName);
-            return Result.succeeded(fileDto);
+            return ResponseEntity.ok(fileDto);
         } catch (Exception e) {
             logger.info("上传发生错误: {}！", e.getMessage());
-            return Result.failure("上传失败");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Result.failure("上传失败"));
         }
     }
 }
