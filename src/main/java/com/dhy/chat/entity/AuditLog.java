@@ -24,6 +24,8 @@ public class AuditLog extends BaseAuditEntity {
 
     private Integer status;
 
+    private String IpAddress;
+
     public String getId() {
         return id;
     }
@@ -54,5 +56,13 @@ public class AuditLog extends BaseAuditEntity {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public String getIpAddress() {
+        return IpAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        IpAddress = ipAddress;
     }
 }

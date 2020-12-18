@@ -1,4 +1,4 @@
-package com.dhy.chat.web.service.impl;
+package com.dhy.chat.web.service.user.impl;
 
 import com.dhy.chat.entity.User;
 import com.dhy.chat.web.repository.UserRepository;

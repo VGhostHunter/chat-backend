@@ -7,24 +7,54 @@ spring:
   messages:
     basename: i18n.message
   profiles:
-    active: dev
+    active: ${chat-active:dev}
+  mail:
+    host: ${SMTP_HOST}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    port: ${SMTP_PORT}
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+          auth: true
+          starttls:
+            enable: true
 server:
   port: 62519
 nettyserver:
   port: 62520
 
 chat:
-  appId: appId
-  appKey: appKey
-  masterSecret: masterSecret
+  appId: ${chat-appId}
+  appKey: ${chat-appKey}
+  masterSecret: ${chat-masterSecret}
   url: http://sdk.open.api.igexin.com/apiex.htm
 
-# JWT配置
-jwt:
-  signKey: 123456
-  # HeaderKEY
-  tokenHeader: Authorization
-  # Token前缀字符
-  tokenPrefix: Chat-
-  issuer: chat
-  expiration: 86400000
+app:
+  # JWT配置
+  jwt:
+    key: ${JWT_KEY}
+    refreshKey: ${JWT_REFRESH_KEY}
+    # HeaderKEY
+    tokenHeader: Authorization
+    # Token前缀字符
+    tokenPrefix: Chat-
+    accessTokenExpireTime: 3600000
+    refreshTokenExpireTime: 2592000000
+  ali-sms-properties:
+    api-key: ${ALI_AIP_KEY}
+    api-secret: ${ALI_AIP_SECRET}
+  leanCloud:
+    app-id: ${LEANCLOUD_APP_ID}}
+    app-key: ${LEANCLOUD_APP_KEY}}
+  provider:
+    sms-provider:
+      name: ali
+    email-provider:
+      name: smtp
+  minio:
+    accessKey: ${MINIO_ACCESS_KEY}
+    secretKey: ${MINIO_SECRET_KEY}
+    endPoint: ${MINIO_ENDPOINT}

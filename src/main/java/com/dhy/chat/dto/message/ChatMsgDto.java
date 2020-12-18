@@ -1,10 +1,13 @@
-package com.dhy.chat.dto;
+package com.dhy.chat.dto.message;
 
 import com.dhy.chat.enums.MsgType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
+/**
+ * @author vghosthunter
+ */
 public class ChatMsgDto {
 
     private String id;

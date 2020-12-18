@@ -1,13 +1,13 @@
-package com.dhy.chat.web.service.impl;
+package com.dhy.chat.web.service.msg.impl;
 
-import com.dhy.chat.dto.ChatMsgDto;
-import com.dhy.chat.dto.GetUserChatMsgListDto;
+import com.dhy.chat.dto.message.ChatMsgDto;
+import com.dhy.chat.dto.message.GetUserChatMsgListDto;
 import com.dhy.chat.dto.PageResult;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.exception.BusinessException;
 import com.dhy.chat.web.repository.ChatMsgRepository;
-import com.dhy.chat.web.service.IChatMsgService;
-import com.dhy.chat.web.service.IUserService;
+import com.dhy.chat.web.service.msg.IChatMsgService;
+import com.dhy.chat.web.service.user.IUserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;

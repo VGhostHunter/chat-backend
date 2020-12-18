@@ -1,5 +1,8 @@
-package com.dhy.chat.dto;
+package com.dhy.chat.dto.user;
 
+/**
+ * @author vghosthunter
+ */
 public class UserDto {
 
     private String id;
@@ -9,6 +12,10 @@ public class UserDto {
     private String mobile;
 
     private String picture;
+
+    private String email;
+
+    private boolean usingMfa;
 
     public String getId() {
         return id;
@@ -40,5 +47,21 @@ public class UserDto {
 
     public void setPicture(String picture) {
         this.picture = picture;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isUsingMfa() {
+        return usingMfa;
+    }
+
+    public void setUsingMfa(boolean usingMfa) {
+        this.usingMfa = usingMfa;
     }
 }

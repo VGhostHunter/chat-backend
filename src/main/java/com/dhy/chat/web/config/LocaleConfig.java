@@ -1,7 +1,9 @@
 package com.dhy.chat.web.config;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -12,9 +14,23 @@ import java.util.Locale;
 
 /**
  * 配置国际化语言
+ * @author vghosthunter
  */
 @Configuration
 public class LocaleConfig {
+
+    private final MessageSource messageSource;
+
+    public LocaleConfig(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    @Bean
+    public LocalValidatorFactoryBean localValidatorFactoryBean() {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource);
+        return bean;
+    }
 
     /**
      * 默认解析器 其中locale表示默认语言

@@ -1,6 +1,7 @@
 package com.dhy.chat.web.handler;
 
 import com.dhy.chat.dto.Result;
+import com.dhy.chat.utils.LocalMessageUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -18,9 +19,12 @@ import java.io.IOException;
 public class UserAuthenticationEntryPointHandler implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
+    private final LocalMessageUtil localMessageUtil;
 
-    public UserAuthenticationEntryPointHandler(ObjectMapper objectMapper) {
+    public UserAuthenticationEntryPointHandler(ObjectMapper objectMapper,
+                                               LocalMessageUtil localMessageUtil) {
         this.objectMapper = objectMapper;
+        this.localMessageUtil = localMessageUtil;
     }
 
     /**
@@ -30,6 +34,6 @@ public class UserAuthenticationEntryPointHandler implements AuthenticationEntryP
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.UNAUTHORIZED, "用户未登录")));
+        response.getWriter().write(objectMapper.writeValueAsString(Result.failure(HttpStatus.UNAUTHORIZED, localMessageUtil.GetMsg("message.userNotLogin"))));
     }
 }

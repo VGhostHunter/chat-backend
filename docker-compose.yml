@@ -10,6 +10,14 @@ services:
       - "62520:62520"
     env_file:
       - '.env'
+    environment:
+      JWT_KEY: ${JWT_KEY}
+      JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_PORT: ${SMTP_PORT}
     container_name: chat-backend
     networks:
       - chat-backend
@@ -42,6 +50,24 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
+
+  redis:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - chat-backend
+    container_name: redis
+    volumes:
+      - "/data/redis/data:/data"
+      - "/data/redis/redis.conf:/etc/redis/redis.conf"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]
 
   mysql:
     image: 'mysql:8.0.22'

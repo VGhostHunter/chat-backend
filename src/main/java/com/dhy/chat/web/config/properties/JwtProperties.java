@@ -1,31 +1,36 @@
 package com.dhy.chat.web.config.properties;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
 /**
  * @author vghosthunter
  */
-@Configuration
-@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    private String signKey;
+    private String key;
 
-    private String tokenHeader;
+    private String refreshKey;
 
-    private String tokenPrefix;
+    private String tokenHeader = "Authorization";
 
-    private String issuer;
+    private String tokenPrefix = "Bearer ";
 
-    private int expiration;
+    private long accessTokenExpireTime = 3600000;
 
-    public String getSignKey() {
-        return signKey;
+    private long refreshTokenExpireTime = 2592000000L;
+
+    public String getKey() {
+        return key;
     }
 
-    public void setSignKey(String signKey) {
-        this.signKey = signKey;
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getRefreshKey() {
+        return refreshKey;
+    }
+
+    public void setRefreshKey(String refreshKey) {
+        this.refreshKey = refreshKey;
     }
 
     public String getTokenHeader() {
@@ -44,19 +49,19 @@ public class JwtProperties {
         this.tokenPrefix = tokenPrefix;
     }
 
-    public String getIssuer() {
-        return issuer;
+    public long getAccessTokenExpireTime() {
+        return accessTokenExpireTime;
     }
 
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
+    public void setAccessTokenExpireTime(long accessTokenExpireTime) {
+        this.accessTokenExpireTime = accessTokenExpireTime;
     }
 
-    public int getExpiration() {
-        return expiration;
+    public long getRefreshTokenExpireTime() {
+        return refreshTokenExpireTime;
     }
 
-    public void setExpiration(int expiration) {
-        this.expiration = expiration;
+    public void setRefreshTokenExpireTime(long refreshTokenExpireTime) {
+        this.refreshTokenExpireTime = refreshTokenExpireTime;
     }
 }
