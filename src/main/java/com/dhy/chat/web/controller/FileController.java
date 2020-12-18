@@ -46,7 +46,6 @@ public class FileController {
         try {
             var bucket = BucketExistsArgs.builder().bucket(MinioProperties.profilePicture).build();
             boolean isExist = minioClient.bucketExists(bucket);
-            int o = 0/0;
             if (! isExist) {
                 //创建存储桶并设置只读权限
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(MinioProperties.profilePicture).region("aws-cn").build());
