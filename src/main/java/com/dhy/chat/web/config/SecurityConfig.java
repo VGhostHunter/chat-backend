@@ -200,8 +200,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                             "/v3/api-docs",
                             "/webjars/**",
                             "/favicon.ico").permitAll()
+//                    .antMatchers("/api/user/{id}/**").access("authentication.name.equals(#id)")
+//                自定义校验方法 name or id equals #param
+//                    .antMatchers("/api/user/{id}/**").access("@userServiceImpl.isValidUser(authentication, #id)")
                     .antMatchers("/api/**").hasAuthority(ChatAppSeeder.GENERAL_USER)
-                    .anyRequest().authenticated()
+                    .anyRequest().denyAll()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(userAuthenticationEntryPointHandler)

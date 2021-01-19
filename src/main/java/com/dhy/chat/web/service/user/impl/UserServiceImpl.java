@@ -179,7 +179,7 @@ public class UserServiceImpl implements IUserService {
                         throw new ArgumentException(messageUtil.GetMsg("message.mfaTypeNotSupport"));
                     }
                 }, () -> {
-                    throw new BusinessException(messageUtil.GetMsg("message.invalidMfaId"));
+                    throw new ArgumentException(messageUtil.GetMsg("message.invalidMfaId"));
                 });
     }
 

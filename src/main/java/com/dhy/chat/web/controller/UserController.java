@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +60,7 @@ public class UserController {
 
     @PutMapping("/{id}/clientId")
     @ApiOperation("更新ClientId")
+    @PreAuthorize("authentication.name.equals(#id)")
     private Result updateClientId(@PathVariable String id, @RequestParam String clientId) {
         userService.updateClientId(id, clientId);
         return Result.succeeded();

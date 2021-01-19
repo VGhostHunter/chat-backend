@@ -26,10 +26,10 @@ public class LeanCloudSmsService implements ISmsService {
     public void send(String mobile, String msg) {
         var option = new AVSMSOption();
         option.setTtl(10);
-        option.setApplicationName("慕课网实战Spring Security");
+        option.setApplicationName("chat");
         option.setOperation("两步验证");
         option.setTemplateName("登录验证");
-        option.setSignatureName("慕课网");
+        option.setSignatureName("chat");
         option.setType(AVSMS.TYPE.TEXT_SMS);
         option.setEnvMap(Map.of("smsCode", msg));
         AVSMS.requestSMSCodeInBackground(mobile, option)
