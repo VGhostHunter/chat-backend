@@ -187,7 +187,7 @@ public class UserServiceImpl implements IUserService {
     public AuthDto loginWithTotp(TotpVerificationDto input) {
         return userCacheService.verifyTotp(input.getMfaId(), input.getCode())
                 .map(this::login)
-                .orElseThrow(() -> new BadCredentialsException("message.verifyCodeWrong"));
+                .orElseThrow(() -> new BadCredentialsException(messageUtil.GetMsg("message.verifyCodeWrong")));
     }
 
     private AuthDto login(User user) {

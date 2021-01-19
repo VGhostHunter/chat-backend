@@ -14,6 +14,8 @@ public class AppProperties {
 
     private AliSmsProperties aliSmsProperties = new AliSmsProperties();
 
+    private MinioProperties minio = new MinioProperties();
+
     private ProviderProperties provider = new ProviderProperties();
 
     private LeanCloudProperties leanCloud = new LeanCloudProperties();
@@ -48,5 +50,13 @@ public class AppProperties {
 
     public void setLeanCloud(LeanCloudProperties leanCloud) {
         this.leanCloud = leanCloud;
+    }
+
+    public MinioProperties getMinio() {
+        return minio;
+    }
+
+    public void setMinio(MinioProperties minio) {
+        this.minio = minio;
     }
 }

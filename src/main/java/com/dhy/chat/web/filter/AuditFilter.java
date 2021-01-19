@@ -3,6 +3,8 @@ package com.dhy.chat.web.filter;
 import com.dhy.chat.entity.AuditLog;
 import com.dhy.chat.entity.User;
 import com.dhy.chat.web.repository.AuditLogRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +23,7 @@ import java.io.IOException;
 public class AuditFilter extends OncePerRequestFilter {
 
     private final AuditLogRepository auditLogRepository;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public AuditFilter(AuditLogRepository auditLogRepository) {
         this.auditLogRepository = auditLogRepository;
@@ -28,19 +31,27 @@ public class AuditFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setMethod(request.getMethod());
-        auditLog.setPath(request.getRequestURI());
-        auditLogRepository.save(auditLog);
+        if(request.getRequestURI().contains("swagger")) {
+            filterChain.doFilter(request, response);
+        } else {
+            AuditLog auditLog = new AuditLog();
+            auditLog.setMethod(request.getMethod());
+            auditLog.setPath(request.getRequestURI());
+            auditLog.setIpAddress(request.getHeader("X-Real-IP"));
 
-        request.setAttribute("auditLogId", auditLog.getId());
+            logger.info("X-Real-Ip{}", request.getHeader("X-Real-Ip"));
+            logger.info("X-Forwarded-For{}", request.getHeader("X-Forwarded-For"));
+            auditLogRepository.save(auditLog);
 
-        filterChain.doFilter(request, response);
+            request.setAttribute("auditLogId", auditLog.getId());
 
-        String id = (String) request.getAttribute("auditLogId");
-        AuditLog a = auditLogRepository.findById(id).get();
-        a.setStatus(response.getStatus());
+            filterChain.doFilter(request, response);
 
-        auditLogRepository.save(a);
+            String id = (String) request.getAttribute("auditLogId");
+            AuditLog a = auditLogRepository.findById(id).get();
+            a.setStatus(response.getStatus());
+
+            auditLogRepository.save(a);
+        }
     }
 }

@@ -54,3 +54,7 @@ app:
       name: ali
     email-provider:
       name: smtp
+  minio:
+    accessKey: ${MINIO_ACCESS_KEY}
+    secretKey: ${MINIO_SECRET_KEY}
+    endPoint: ${MINIO_ENDPOINT}
