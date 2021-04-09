@@ -36,24 +36,23 @@ public class UserController {
         this.userCacheService = userCacheService;
     }
 
-
     @PostMapping("/create")
     @ApiOperation("Create User")
-    private Result<UserDto> create(@Validated @RequestBody CreateUserDto createUserDto) {
+    public Result<UserDto> create(@Validated @RequestBody CreateUserDto createUserDto) {
         UserDto userDto = userService.createUser(createUserDto);
         return Result.succeeded(userDto);
     }
 
     @GetMapping
     @ApiOperation("Get User By Username")
-    private Result<UserDto> get(@RequestParam String username) {
+    public Result<UserDto> get(@RequestParam String username) {
         UserDto userDto = userService.getUserByUsername(username);
         return Result.succeeded(userDto);
     }
 
     @GetMapping("/{id}")
     @ApiOperation("Get User By Id")
-    private Result<UserDto> getById(@PathVariable String id) {
+    public Result<UserDto> getById(@PathVariable String id) {
         UserDto userDto = userService.getById(id);
         return Result.succeeded(userDto);
     }
@@ -61,7 +60,7 @@ public class UserController {
     @PutMapping("/{id}/clientId")
     @ApiOperation("更新ClientId")
     @PreAuthorize("authentication.name.equals(#id)")
-    private Result updateClientId(@PathVariable String id, @RequestParam String clientId) {
+    public Result updateClientId(@PathVariable String id, @RequestParam String clientId) {
         userService.updateClientId(id, clientId);
         return Result.succeeded();
     }
@@ -71,7 +70,7 @@ public class UserController {
      */
     @PostMapping("/token")
     @ApiOperation("User Login")
-    private ResponseEntity<?> token(@Validated @RequestBody LoginDto input) {
+    public ResponseEntity<?> token(@Validated @RequestBody LoginDto input) {
         return userService.getOptionalByUsernameAndPassword(input)
                 .map(user -> {
                     if(user.isUsingMfa()) {
@@ -102,7 +101,7 @@ public class UserController {
      */
     @PostMapping("/token/refresh")
     @ApiOperation("refresh token ")
-    private Result<AuthDto> refresh(@RequestHeader(name = "Authorization") String token,
+    public Result<AuthDto> refresh(@RequestHeader(name = "Authorization") String token,
                                     @RequestParam String refreshToken) {
         return Result.succeeded(userService.refreshToken(token, refreshToken));
     }

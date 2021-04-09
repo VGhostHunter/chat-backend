@@ -5,10 +5,10 @@ import com.dhy.chat.dto.message.GetUserChatMsgListDto;
 import com.dhy.chat.dto.PageResult;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.exception.BusinessException;
+import com.dhy.chat.mapper.ChatMsgMapper;
 import com.dhy.chat.web.repository.ChatMsgRepository;
 import com.dhy.chat.web.service.msg.IChatMsgService;
 import com.dhy.chat.web.service.user.IUserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -26,10 +26,14 @@ public class ChatMsgServiceImpl implements IChatMsgService {
 
     private final ChatMsgRepository chatMsgRepository;
     private final IUserService userService;
+    private final ChatMsgMapper chatMsgMapper;
 
-    public ChatMsgServiceImpl(ChatMsgRepository chatMsgRepository, IUserService userService) {
+    public ChatMsgServiceImpl(ChatMsgRepository chatMsgRepository,
+                              IUserService userService,
+                              ChatMsgMapper chatMsgMapper) {
         this.chatMsgRepository = chatMsgRepository;
         this.userService = userService;
+        this.chatMsgMapper = chatMsgMapper;
     }
 
 
@@ -52,8 +56,7 @@ public class ChatMsgServiceImpl implements IChatMsgService {
         userIds.add(acceptUserId);
         Set<String> clientIds = userService.getUserClientIds(userIds);
         if(clientIds.size() > 0) {
-            ChatMsgDto chatMsgDto = new ChatMsgDto();
-            BeanUtils.copyProperties(chatMsg, chatMsgDto);
+            ChatMsgDto chatMsgDto = chatMsgMapper.toDto(chatMsg);
             chatMsgDto.setClientId(clientIds.iterator().next());
 
             chatMsg.setClientId(chatMsgDto.getClientId());

@@ -3,6 +3,7 @@ package com.dhy.chat.netty;
 import com.dhy.chat.dto.message.ChatMsgDto;
 import com.dhy.chat.entity.ChatMsg;
 import com.dhy.chat.enums.MsgActionEnum;
+import com.dhy.chat.mapper.ChatMsgMapper;
 import com.dhy.chat.utils.JwtTokenUtil;
 import com.dhy.chat.utils.SpringUtils;
 import com.dhy.chat.web.config.properties.AppProperties;
@@ -21,7 +22,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,12 +36,14 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     private final IPushService pushService;
     private final JwtTokenUtil jwtTokenUtil;
     private final AppProperties appProperties;
+    private final ChatMsgMapper chatMsgMapper;
 
     public ChatHandler() {
         chatMsgService = (IChatMsgService) SpringUtils.getBean("chatMsgService");
         pushService = (IPushService) SpringUtils.getBean("pushServiceImpl");
         jwtTokenUtil = (JwtTokenUtil) SpringUtils.getBean("jwtTokenUtil");
         appProperties = (AppProperties) SpringUtils.getBean("appProperties");
+        chatMsgMapper = (ChatMsgMapper) SpringUtils.getBean("chatMsgMapper");
     }
 
     /**
@@ -93,8 +95,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
     private void chat(Channel currentChannel, DataContent dataContent) throws JsonProcessingException {
         // 聊天类型的消息，把聊天记录保存到数据库，同时标记消息的签收状态[未签收]
-        ChatMsg chatMsg = new ChatMsg();
-        BeanUtils.copyProperties(dataContent.getChatMsg(), chatMsg);
+        var chatMsg = chatMsgMapper.toEntity(dataContent.getChatMsg());
         // 保存消息到MongoDb，并且标记为 未签收
         ChatMsgDto dto = chatMsgService.saveChatMsg(chatMsg);
 

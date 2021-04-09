@@ -31,6 +31,8 @@ public class CreateUserDto {
     @Email
     private String email;
 
+    private boolean usingMfa;
+
     public String getUsername() {
         return username;
     }
@@ -69,5 +71,13 @@ public class CreateUserDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isUsingMfa() {
+        return usingMfa;
+    }
+
+    public void setUsingMfa(boolean usingMfa) {
+        this.usingMfa = usingMfa;
     }
 }

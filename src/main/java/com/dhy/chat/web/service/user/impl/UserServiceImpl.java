@@ -6,6 +6,7 @@ import com.dhy.chat.entity.User;
 import com.dhy.chat.enums.MfaType;
 import com.dhy.chat.exception.ArgumentException;
 import com.dhy.chat.exception.BusinessException;
+import com.dhy.chat.mapper.UserMapper;
 import com.dhy.chat.utils.JwtTokenUtil;
 import com.dhy.chat.utils.LocalMessageUtil;
 import com.dhy.chat.utils.TotpUtil;
@@ -15,7 +16,6 @@ import com.dhy.chat.web.repository.UserRepository;
 import com.dhy.chat.web.service.email.IEmailService;
 import com.dhy.chat.web.service.sms.ISmsService;
 import com.dhy.chat.web.service.user.IUserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.util.Pair;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -44,6 +44,7 @@ public class UserServiceImpl implements IUserService {
     private final IUserCacheService userCacheService;
     private final ISmsService smsService;
     private final IEmailService emailService;
+    private final UserMapper userMapper;
 
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
@@ -54,7 +55,8 @@ public class UserServiceImpl implements IUserService {
                            TotpUtil totpUtil,
                            IUserCacheService userCacheService,
                            ISmsService smsService,
-                           IEmailService emailService) {
+                           IEmailService emailService,
+                           UserMapper userMapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
@@ -65,6 +67,7 @@ public class UserServiceImpl implements IUserService {
         this.userCacheService = userCacheService;
         this.smsService = smsService;
         this.emailService = emailService;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -76,9 +79,7 @@ public class UserServiceImpl implements IUserService {
         }
 
         checkUser(user);
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        return userDto;
+        return userMapper.toDto(user);
     }
 
     private void checkUser(User user) {
@@ -113,15 +114,12 @@ public class UserServiceImpl implements IUserService {
 
         return authorityRepository.findOptionalByAuthority(ChatAppSeeder.GENERAL_USER)
                 .map(role -> {
-                    User user = new User();
-                    BeanUtils.copyProperties(createUserDto, user);
+                    var user = userMapper.toEntity(createUserDto);
                     user.setPassword(passwordEncoder.encode(user.getPassword()));
                     user.setAuthorities(Set.of(role));
                     user.setMfaKey(totpUtil.generateStringKey());
                     userRepository.save(user);
-                    UserDto userDto = new UserDto();
-                    BeanUtils.copyProperties(user, userDto);
-                    return userDto;
+                    return userMapper.toDto(user);
                 }).orElseThrow();
     }
 
@@ -129,9 +127,7 @@ public class UserServiceImpl implements IUserService {
     public UserDto getById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(user, userDto);
-        return userDto;
+        return userMapper.toDto(user);
     }
 
     @Override
