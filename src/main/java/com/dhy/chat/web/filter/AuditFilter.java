@@ -39,8 +39,8 @@ public class AuditFilter extends OncePerRequestFilter {
             auditLog.setPath(request.getRequestURI());
             auditLog.setIpAddress(request.getHeader("X-Real-IP"));
 
-            logger.info("X-Real-Ip{}", request.getHeader("X-Real-Ip"));
-            logger.info("X-Forwarded-For{}", request.getHeader("X-Forwarded-For"));
+            logger.info("X-Real-Ip:{}", request.getHeader("X-Real-Ip"));
+            logger.info("X-Forwarded-For:{}", request.getHeader("X-Forwarded-For"));
             auditLogRepository.save(auditLog);
 
             request.setAttribute("auditLogId", auditLog.getId());
