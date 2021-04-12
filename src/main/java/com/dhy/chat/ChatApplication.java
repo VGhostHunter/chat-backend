@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.text.SimpleDateFormat;
 
@@ -20,6 +22,8 @@ import java.text.SimpleDateFormat;
  * 构造器中可以添加对象初始化的校验逻辑。
  * 可以清楚的区分对象是通过setter方法注入的（非final对象）还是通过强制依赖注入的（final对象）
  */
+@EnableAsync
+@EnableScheduling
 @EnableMongoAuditing
 @EnableJpaAuditing
 @SpringBootApplication
