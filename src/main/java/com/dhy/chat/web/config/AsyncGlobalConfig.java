@@ -19,13 +19,19 @@ public class AsyncGlobalConfig extends AsyncConfigurerSupport {
         this.asyncUncaughtExceptionHandler = asyncUncaughtExceptionHandler;
     }
 
+    /**
+     * @link https://mp.weixin.qq.com/s?__biz=MzI4Njc5NjM1NQ==&mid=2247503725&idx=1&sn=16a25488f6de353537da82c89a456596
+     * 连接数 = ((核心数 * 2) + 有效磁盘数)
+     * 公理：你需要一个小连接池，和一个充满了等待连接的线程的队列
+     * @return Executor
+     */
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setThreadNamePrefix(THREAD_PREFIX);
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(100);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(1000);
         executor.setKeepAliveSeconds(60);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
