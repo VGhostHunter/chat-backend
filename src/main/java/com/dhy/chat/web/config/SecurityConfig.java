@@ -34,9 +34,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author vghosthunter
@@ -165,14 +163,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      *
      * @return CorsConfigurationSource
      */
-//    @Bean
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 允许跨域访问的主机
+        var list = new ArrayList<String>();
+        list.add("http://localhost:62519");
+        list.add("http://127.0.0.1:62519");
+        list.add("https://47.103.23.130:62519");
+        list.add("https://chat.vghost.top");
         if (environment.acceptsProfiles(Profiles.of("dev"))) {
-            configuration.setAllowedOrigins(Collections.singletonList("http://localhost:62519"));
+            configuration.setAllowedOrigins(list);
         } else {
-            configuration.setAllowedOrigins(Collections.singletonList("https://chat.vghost.top"));
+            configuration.setAllowedOrigins(list);
         }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -224,8 +227,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .logoutSuccessHandler(userLogoutSuccessHandler)
                 )
                 // 开启跨域
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .cors(cors -> Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .cors(cors -> Customizer.withDefaults())
                 // 取消跨站请求伪造防护
                 .csrf(AbstractHttpConfigurer::disable);
     }
